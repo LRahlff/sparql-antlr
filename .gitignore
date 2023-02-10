@@ -1,2 +1,4 @@
-.idea*
 connection_properties.json
+gen/*
+venv/*
+.idea/*

@@ -1,0 +1,30 @@
+PREFIX : <urn:absolute/prototyp#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?v
+WHERE {
+    ?m a :Modell ;
+       :hat_Eingabe ?p1 ;
+       :hat_Eingabe ?p2 .
+    
+    ?p1 a :relative_Permittivitaet ;
+		a :Parameter_Neu;
+    	:hat_Wert "1".
+    
+    ?p2 a ?par ;
+    	:hat_Wert "17".
+	
+    ?m :hat_Ausgabe ?p .
+    ?p :hat_Wert ?v .
+
+	?mat :hat_Parameter ?p1;
+		 :hat_Name ?material .
+
+	?mat2 :hat_Parameter ?p2;
+		 :hat_Name '1df' .
+	?mat2 a :Material_Neu.
+
+	FILTER(?par IN (:Kraft, :Parameter_Neu))
+	FILTER(?material =  :M524.5).
+	FILTER(?material IN ( :M1100 , :M1599 )).
+}

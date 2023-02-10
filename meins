@@ -1,0 +1,13 @@
+java -jar antlr-4.11.1-complete.jar -Dlanguage=Python3 Sparql.g4
+
+LINE_COMMENT
+: '#' ~[\r\n]* -> skip
+;
+COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
+
+WS
+    : (' '
+    | '\t'
+    | '\n'
+    | '\r')+ ->skip
+    ;

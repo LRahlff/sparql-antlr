@@ -1,3 +1,4 @@
+import json
 from antlr4 import *
 from SparqlLexer import SparqlLexer
 from SparqlParser import SparqlParser
@@ -37,7 +38,7 @@ if __name__ == '__main__':
 					params.append(verbObject.objectList()[i].getText())
 			clauses_new = clauses_new.triplesBlock()
 		print('done')
-
+		
 		conn = psycopg2.connect(
 			database=database,
 			user=user,
