@@ -1,7 +1,14 @@
 import json
+import re
+import sys
+
 from antlr4 import *
-from SparqlLexer import SparqlLexer
-from SparqlParser import SparqlParser
+
+from MyNode import MyNode
+from MyRelationTree import MyRelationTree
+from MyWalkListener import MyWalkListener
+from gen.SparqlLexer import SparqlLexer
+from gen.SparqlParser import SparqlParser
 
 # importing psycopg2 module
 import psycopg2
@@ -10,6 +17,7 @@ import psycopg2
 
 
 # https://github.com/antlr/grammars-v4/blob/master/sparql/Sparql.g4
+# attention: grammar now changed a little
 
 if __name__ == '__main__':
 	f = open('connection_properties.json')
@@ -20,127 +28,178 @@ if __name__ == '__main__':
 	host = data['conn_details'][0]['host']
 	port = data['conn_details'][0]['port']
 	f.close()
-	with open('query.txt', 'r') as fr:
-		print('done')
-		sparql_lexer = SparqlLexer(InputStream(fr.read()))
-		sparql_tokens = CommonTokenStream(sparql_lexer)
-		sparql_parser = SparqlParser(sparql_tokens)
-		clauses = sparql_parser.query().selectQuery().whereClause().groupGraphPattern().triplesBlock()[0]
+	# print(sys.argv)
+	# print(len(sys.argv))
+	if len(sys.argv) < 2:
+		print("taking file as query")
+		with open('../../antlr/pycharm/query_new.txt', 'r') as fr:
+			query = fr.read()
+	else:
+		query = sys.argv[1]
 
-		# TODO: Können keine Kommentare eingelesen werden?
-		clauses_new = clauses
-		params = []
-		# Bestimmung der neuen Parameter
-		while clauses_new is not None:
-			verbObject = clauses_new.triplesSameSubject().propertyListNotEmpty()
-			for i in range(0, len(verbObject.verb())):
-				if verbObject.verb()[i].getText() == ':hat_Eingabe_Neu':
-					params.append(verbObject.objectList()[i].getText())
-			clauses_new = clauses_new.triplesBlock()
-		print('done')
-		
-		conn = psycopg2.connect(
-			database=database,
-			user=user,
-			password=password,
-			host=host,
-			port=port
-		)
-		
-		# creating a cursor object
-		cursor = conn.cursor()
+	sparql_lexer = SparqlLexer(InputStream(query))
+	sparql_tokens = CommonTokenStream(sparql_lexer)
+	sparql_parser = SparqlParser(sparql_tokens)
+	start = sparql_parser.query()
 
-		cursor.execute('''DELETE FROM concr_param_new''')
-		cursor.execute('''SELECT count(*) from concr_param_new_view''')
-		count = cursor.fetchone()
-		print('done')
-		if count[0] > 0:
-			cursor.execute('''REFRESH MATERIALIZED VIEW concr_param_new_view''')
-		print('done')
-
-		# Commit your changes in the database
-		conn.commit()
+	walker = ParseTreeWalker()
 
 
+	myTree = MyRelationTree()
 
-		if len(params) > 0:
-			result = []
-			# vernünftige ID festlegen
-			for p in params:
-				# 1. ID,
-				# 2. mod_meas_id
-				# 3. param_id
-				# 4. mat_sample_id (einfuegen eines Dummys, ersetzen falls Info vorhanden)
-				# 5. meas_time (erstmal 0)
-				# 6. Wert
-				# TODO: Matrixelemente fehlen noch
-				result.append(['123'+p, 'NULL',None , 'unknown_material', 0, None])
+	listener = MyWalkListener(myTree)
 
-			# Bestimmung der Werte der Parameter
-			clauses_new = clauses
-			while clauses_new is not None:
-				noun = clauses_new.triplesSameSubject().varOrTerm()
-				verbObject = clauses_new.triplesSameSubject().propertyListNotEmpty()
-				for i in range(0, len(verbObject.verb())):
-					if noun.getText() in params:
-
-						index = params.index(noun.getText())
-						if verbObject.verb()[i].getText() == 'a':
-							result[index][2] = verbObject.objectList()[i].getText()[1:]
-						if verbObject.verb()[i].getText() == ':hat_Wert':
-							result[index][5] = verbObject.objectList()[i].getText().strip('\"')
-						if verbObject.verb()[i].getText() == ':besteht_aus':
-							# Material wird entweder durch Filter oder durch eine 'hat_Name'-Relation festgelegt
-							# TODO: Behandlung fehlt noch
-							pass
-				clauses_new = clauses_new.triplesBlock()
+	walker.walk(listener, start)
 
 
-			print(result)
+	# tree = myTree.forward
+	# for subj in tree:
+	# 	print(subj)
+	# 	for pred in tree[subj]:
+	# 		print('    ' + str(pred))
+	# 		for obj in tree[subj][pred]:
+	# 			print('        ' + str(obj))
+	#
+	# print('----------------------------------')
+	#
+	#
+	# revtree = myTree.reverse
+	# for subj in revtree:
+	# 	print(subj)
+	# 	for pred in revtree[subj]:
+	# 		print('    ' + str(pred))
+	# 		for obj in revtree[subj][pred]:
+	# 			print('        ' + str(obj))
+	#
+	# print('----------------------------------')
 
-			# Schreiben einer View, die die Einträge aus result enthält; Aufruf einer refresh_view-Funktion,
-			# die nur notwendige Neuberechnungen durchführt, d.h., welche, die auf den neuen Werten basieren
-			# establishing the connection
+	myTree.traverseVars()
+
+
+	# print('----------------------------------')
+	# tree = myTree.forward
+	# for subj in tree:
+	# 	print(subj)
+	# 	for pred in tree[subj]:
+	# 		print('    ' + str(pred))
+	# 		for obj in tree[subj][pred]:
+	# 			print('        ' + str(obj))
 
 
 
-			# creating table
-			# sql = '''CREATE TABLE concr_param_new (
-			# 		concr_param_id character varying NOT NULL,
-			# 		mod_meas_id character varying,
-			# 		param_id character varying NOT NULL,
-			# 		mat_sample_id character varying NOT NULL,
-			# 		meas_time integer,
-			# 		value real
-			# 	);'''
+	# print('finish')
+
+	conn = psycopg2.connect(
+		database=database,
+		user=user,
+		password=password,
+		host=host,
+		port=port
+	)
+
+	cursor = conn.cursor()
+
+	cursor.execute("DELETE FROM new_param_id;")
+	cursor.execute("DELETE FROM new_mat_sample_id;")
+	cursor.execute("DELETE FROM new_mat_samples;")
+	cursor.execute("DELETE FROM new_value;")
 
 
 
-			# inserting record into employee table
-			for d in result:
-				value = d[5]
-			print(value)
-			#	cursor.execute("INSERT into concr_param_new VALUES (%s, %s, %s, %s, %s, %s)", d)
+	# cursor.execute("DROP TABLE IF EXISTS new_param_id;")
+	# cursor.execute("CREATE TABLE new_param_id (new_val_id character varying, param_id character varying);")
+	# cursor.execute("DROP TABLE IF EXISTS new_mat_sample_id;")
+	# cursor.execute("CREATE TABLE new_mat_sample_id (new_val_id character varying, mat_sample_id character varying);")
+	# cursor.execute("DROP TABLE IF EXISTS new_mat_samples;")
+	# cursor.execute("CREATE TABLE new_mat_samples (mat_sample_id character varying);")
+	# cursor.execute("DELETE FROM new_mat_samples;")
+	# cursor.execute("DROP TABLE IF EXISTS new_value;")
+	# cursor.execute("CREATE TABLE new_value (new_val_id character varying, value double precision);")
 
-			# Sehr stark gemogelte Version; eigentlich sollte hier ausschließlich das eingefuegt werden, was in result steht
-			cursor.execute(
-				"INSERT INTO concr_param_new values ('NiTiCu_20_aus_draht_durchmesser_2',NULL,'Blockierkraft','Drahtaktuator_2',0,"+value+")")
-			cursor.execute(
-				"INSERT INTO concr_param_new values ('Akt_quer_St_2',NULL,'Blockierkraft','Wandlersystem_2',0,"+value+")")
-			cursor.execute(
-				"INSERT INTO concr_param_new values ('Aus_quer_dummy2',NULL,'Blockierkraft','sample_druck-stick_2',0,"+value+")")
-			cursor.execute(
-				"insert into concr_param_new select concr_param_id || '_new',mod_meas_id, param_id, 'sample_druck-stick_2',meas_time, value  from concr_param where mat_sample_id= 'sample_druck-stick' and meas_time > 0")
-			cursor.execute(
-				"INSERT INTO concr_param_new values ('lin_abm_scheibenaktor2',NULL,'lineare_Abmessung','Piezoelektrischer_Scheibenaktor_2',0,"+value+")")
-			cursor.execute("INSERT INTO concr_param_new select concr_param_id, mod_meas_id, param_id, mat_sample_id, meas_time, value from concr_param where param_id = 'maximale_Spannung'")
-			cursor.execute("INSERT INTO concr_param_new select concr_param_id, mod_meas_id, param_id, mat_sample_id, meas_time, value from concr_param_view where param_id = 'maximale_Spannung'")
 
-			cursor.execute('''REFRESH MATERIALIZED VIEW concr_param_new_view''')
+	sql_insert_value = lambda table, val_id, obj : "INSERT INTO " + table +\
+											 " SELECT DISTINCT '" + val_id + "' AS new_val_id, " \
+																"p.param_id AS param_id " \
+												"FROM param p " \
+												"WHERE param_id LIKE '" + obj + "';"
+	sql_insert_material = lambda table, val_id, obj : "INSERT INTO " + table +\
+											 " SELECT DISTINCT '" + val_id + "' AS new_val_id, " \
+																"m.mat_sample_id AS mat_sample_id " \
+												"FROM (SELECT sample_id AS mat_sample_id FROM sample " \
+														"UNION SELECT mat_id AS mat_sample_id FROM material " \
+														"UNION SELECT mat_sample_id AS mat_sample_id FROM new_mat_samples " \
+														") m " \
+												"WHERE mat_sample_id LIKE '" + obj + "';"
 
-			# Commit your changes in the database
-			conn.commit()
 
-			# Closing the connection
-			conn.close()
+	new_mat = myTree.get_new_materials()
 
+	# Todo : better way, maybe with lamda function
+	for m in new_mat:
+		cursor.execute("INSERT INTO new_mat_samples VALUES ('" + m + "') ;")
+	conn.commit()
+
+
+	new_values = myTree.get_new_params()
+	tree = myTree.forward
+	rev_tree = myTree.reverse
+	for new_value in new_values:
+		if tree.get(new_value) is not None:
+			node = MyNode('verb', 'a')
+			if tree[new_value].get(node) is not None:
+				for obj in tree[new_value][node]:
+					if obj.type == 'string' or obj.type == 'konzept':
+						cursor.execute(sql_insert_value('new_param_id', new_value.name, obj.name))
+
+			node = MyNode('konzept', 'hat_Wert')
+			if tree[new_value].get(node) is not None:
+				for obj in tree[new_value][node]:
+					if obj.type == 'numeric':
+						cursor.execute("INSERT INTO new_value VALUES ('" + new_value.name + "', " + obj.name + ") ;")
+
+		if rev_tree.get(new_value) is not None:
+			node = MyNode('konzept', 'hat_Parameter')
+			if rev_tree[new_value].get(node) is not None:
+				for subrev in rev_tree[new_value][node]:
+					if tree.get(subrev) is not None:
+						node2 = MyNode('konzept', 'hat_Name')
+						if tree[subrev].get(node2) is not None:
+							for obj2 in tree[subrev][node2]:
+								if obj2.type == 'string' or obj2.type == 'konzept':
+									cursor.execute(sql_insert_material('new_mat_sample_id', new_value.name, obj2.name))
+	conn.commit()
+
+	# cursor.execute("""INSERT INTO new_concr_param
+	# 					SELECT
+	# 						values.new_val_id || '_' || COALESCE(params.param_id,'undefined_parameter') || '_' || COALESCE(mat_samples.mat_sample_id, 'undefined') || '_' || values.value AS concr_param_id,
+	# 						'new_Val' AS mod_meas_id,
+	# 						COALESCE(params.param_id,'undefined_parameter') AS param_id,
+	# 						COALESCE(mat_samples.mat_sample_id, 'undefined') AS mat_sample_id,
+	# 						0 AS meas_time,
+	# 						values.value AS value
+	# 					FROM new_value values
+	# 						LEFT JOIN
+	# 						new_mat_sample_id mat_samples
+	# 							ON values.new_val_id = mat_samples.new_val_id
+	# 						LEFT JOIN
+	# 						new_param_id params
+	# 							ON values.new_val_id = params.new_val_id;""")
+	#
+	# conn.commit()
+	# print('done')
+
+	cursor.execute("REFRESH MATERIALIZED VIEW new_concr_param")
+	cursor.execute("REFRESH MATERIALIZED VIEW new_concr_param_view")
+	cursor.execute("REFRESH MATERIALIZED VIEW concr_parameter")
+	cursor.execute("REFRESH MATERIALIZED VIEW concr_parameter_new_only")
+	cursor.execute("REFRESH MATERIALIZED VIEW concr_curve_params")
+	cursor.execute("REFRESH MATERIALIZED VIEW concr_curve")
+	cursor.execute("REFRESH MATERIALIZED VIEW concr_curve_params_temp")
+	cursor.execute("REFRESH MATERIALIZED VIEW names")
+
+	conn.commit()
+
+	# Closing the connection
+	conn.close()
+
+	print(' Ende')
