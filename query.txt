@@ -9,10 +9,10 @@ WHERE {
     
     ?p1 a :relative_Permittivitaet ;
 		a :Parameter_Neu;
-    	:hat_Wert "1".
+    	:hat_Wert ?val.
     
     ?p2 a ?par ;
-    	:hat_Wert "17".
+    	:hat_Wert ?v.
 	
     ?m :hat_Ausgabe ?p .
     ?p :hat_Wert ?v .
@@ -21,10 +21,14 @@ WHERE {
 		 :hat_Name ?material .
 
 	?mat2 :hat_Parameter ?p2;
-		 :hat_Name '1df' .
-	?mat2 a :Material_Neu.
+		 :hat_Name '1df'
 
 	FILTER(?par IN (:Kraft, :Parameter_Neu))
-	FILTER(?material =  :M524.5).
-	FILTER(?material IN ( :M1100 , :M1599 )).
+
+	?mat2 a :Material_Neu
+
+	FILTER(?material =  'M524.5').
+	FILTER(?val =  1).
+	FILTER(?v IN (  17, 18, 19)).
+	FILTER(?material IN ( 'M1100' , 'M1599', 'M524.5' ))
 }

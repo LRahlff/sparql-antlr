@@ -1,0 +1,33 @@
+PREFIX : <urn:absolute/prototyp#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT ?p ?vn ?nn  ?mat1 ?material1
+WHERE {
+    ?p1 a ?p1n;
+	a :Parameter_Neu;
+    	:hat_Wert ?v1 .
+
+	?mat :hat_Parameter ?p1;
+		:hat_Name ?material ;
+
+	FILTER(?material = 'Ni2MnGa_sample_1')
+	FILTER(?v1 = 0.8)
+	FILTER(?p1n = :Saettigungspolarisation)
+
+	?p a ?filter;
+	    :hat_Wert ?vn;
+		# fuer python bitte :piezoelektrische_Moment angeben
+	    :hat_Name ?nn;
+		a :Parameter_Neu.
+	FILTER(?filter IN (:Saettigungspolarisation, :Anisotropiefeld, :magnetische_Anisotropiekonstante))
+
+
+	?mat1 :hat_Parameter ?p;
+		:hat_Name ?material1 ;
+}
+
+# ?p1 :hat_Herkunft :Parameter_Neu -> Material
+
+# cli sqltranslation für namen oder hardcoden
+
+# Parameter bleibt bei Konzept

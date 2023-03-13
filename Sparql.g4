@@ -46,31 +46,31 @@ prologue
     ;
 
 baseDecl
-    : 'BASE' IRI_REF
+    : ('BASE'|'base') IRI_REF
     ;
 
 prefixDecl
-    : 'PREFIX' PNAME_NS IRI_REF
+    : ('PREFIX'|'prefix') PNAME_NS IRI_REF
     ;
 
 selectQuery
-    : 'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
+    : ('SELECT'|'select') ( ('DISTINCT'|'distinct') | ('REDUCED'|'reduced') )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
     ;
 
 constructQuery
-    : 'CONSTRUCT' constructTemplate datasetClause* whereClause solutionModifier
+    : ('CONSTRUCT'|'construct') constructTemplate datasetClause* whereClause solutionModifier
     ;
 
 describeQuery
-    : 'DESCRIBE' ( varOrIRIref+ | '*' ) datasetClause* whereClause? solutionModifier
+    : ('DESCRIBE'|'describe') ( varOrIRIref+ | '*' ) datasetClause* whereClause? solutionModifier
     ;
 
 askQuery
-    : 'ASK' datasetClause* whereClause
+    : ('ASK'|'ask') datasetClause* whereClause
     ;
 
 datasetClause
-    : 'FROM' ( defaultGraphClause | namedGraphClause )
+    : ('FROM'|'from') ( defaultGraphClause | namedGraphClause )
     ;
 
 defaultGraphClause
@@ -78,7 +78,7 @@ defaultGraphClause
     ;
 
 namedGraphClause
-    : 'NAMED' sourceSelector
+    : ('NAMED'|'named') sourceSelector
     ;
 
 sourceSelector
@@ -86,7 +86,7 @@ sourceSelector
     ;
 
 whereClause
-    : 'WHERE'? groupGraphPattern
+    : ('WHERE'|'where')? groupGraphPattern
     ;
 
 solutionModifier
@@ -98,20 +98,20 @@ limitOffsetClauses
     ;
 
 orderClause
-    : 'ORDER' 'BY' orderCondition+
+    : ('ORDER'|'order') ('BY'|'by') orderCondition+
     ;
 
 orderCondition
-    : ( ( 'ASC' | 'DESC' ) brackettedExpression )
+    : ( ( ('ASC'|'asc') | ('DESC'|'desc') ) brackettedExpression )
     | ( constraint | var_ )
     ;
 
 limitClause
-    : 'LIMIT' INTEGER
+    : ('LIMIT'|'limit') INTEGER
     ;
 
 offsetClause
-    : 'OFFSET' INTEGER
+    : ('OFFSET'|'offset') INTEGER
     ;
 
 groupGraphPattern
@@ -129,19 +129,19 @@ graphPatternNotTriples
     ;
 
 optionalGraphPattern
-    : 'OPTIONAL' groupGraphPattern
+    : ('OPTIONAL'| 'optional') groupGraphPattern
     ;
 
 graphGraphPattern
-    : 'GRAPH' varOrIRIref groupGraphPattern
+    : ('GRAPH'|'graph') varOrIRIref groupGraphPattern
     ;
 
 groupOrUnionGraphPattern
-    : groupGraphPattern ( 'UNION' groupGraphPattern )*
+    : groupGraphPattern ( ('UNION'|'union') groupGraphPattern )*
     ;
 
 filter_
-    : 'FILTER' constraint
+    : ('FILTER'|'filter') constraint
     ;
 
 constraint

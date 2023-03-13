@@ -28,17 +28,32 @@ if __name__ == '__main__':
 	host = data['conn_details'][0]['host']
 	port = data['conn_details'][0]['port']
 	f.close()
-
-	# print(sys.argv)
-	# print(len(sys.argv))
+	print("\\")
+	print("#")
+	print("\#")
 	if len(sys.argv) < 2:
-		print("taking file as query")
-		with open('../../antlr/pycharm/query_new.txt', 'r') as fr:
-			query = fr.read()
-	else:
-		query = sys.argv[1]
+		print("not enough arguments")
+		sys.exit()
+	print(sys.argv[1])
+	query = sys.argv[1]
+	abc = re.sub("\\\#", " ", query)
+	print(query)
+	print(abc)
+	testq = """PREFIX : <urn:absolute/prototyp#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-	sparql_lexer = SparqlLexer(InputStream(query))
+SELECT ?p ?vn ?nn  ?mat1 ?material1
+WHERE {
+    
+}
+
+# ?p1 :hat_Herkunft :Parameter_Neu -> Material
+
+# cli sqltranslation für namen oder hardcoden
+
+# Parameter bleibt bei Konzept
+	"""
+	sparql_lexer = SparqlLexer(InputStream(testq))
 	sparql_tokens = CommonTokenStream(sparql_lexer)
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
@@ -99,7 +114,6 @@ if __name__ == '__main__':
 	)
 
 	cursor = conn.cursor()
-
 
 	cursor.execute("DELETE FROM new_param_id;")
 	cursor.execute("DELETE FROM new_mat_sample_id;")
