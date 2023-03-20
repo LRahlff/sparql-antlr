@@ -1,0 +1,11 @@
+{
+	"conn_details": [
+		{
+			"database": "test",
+			"user": "test",
+			"password": "test",
+			"host": "localhost",
+			"port": "1234"
+		}
+	]
+}
