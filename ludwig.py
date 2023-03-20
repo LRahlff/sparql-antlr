@@ -1,9 +1,4 @@
-from antlr4 import *
-from gen.SparqlLexer import SparqlLexer
-from gen.SparqlParser import SparqlParser
-
-# importing psycopg2 module
-import psycopg2
+import json
 
 
 
@@ -12,6 +7,15 @@ import psycopg2
 # attention: grammar now changed a little
 
 if __name__ == '__main__':
+	f = open('connection_properties.json')
+	data = json.load(f)
+	database = data['conn_details'][0]['database']
+	user = data['conn_details'][0]['user']
+	password = data['conn_details'][0]['password']
+	host = data['conn_details'][0]['host']
+	port = data['conn_details'][0]['port']
+	f.close()
+	
 	with open('query.txt', 'r') as fr:
 		print('done')
 
@@ -118,6 +122,13 @@ if __name__ == '__main__':
 		# print(reverseRel)
 		# for rev in reverseRel:
 		# 	print('' + rev + '' + str(reverseRel[rev]))
+		conn = psycopg2.connect(
+			database=database,
+			user=user,
+			password=password,
+			host=host,
+			port=port
+		)
 
 
 		# creating a cursor object
