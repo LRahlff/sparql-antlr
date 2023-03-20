@@ -11,6 +11,14 @@ import psycopg2
 # https://github.com/antlr/grammars-v4/blob/master/sparql/Sparql.g4
 
 if __name__ == '__main__':
+	f = open('connection_properties.json')
+	data = json.load(f)
+	database = data['conn_details'][0]['database']
+	user = data['conn_details'][0]['user']
+	password = data['conn_details'][0]['password']
+	host = data['conn_details'][0]['host']
+	port = data['conn_details'][0]['port']
+	f.close()
 	with open('query.txt', 'r') as fr:
 		print('done')
 		sparql_lexer = SparqlLexer(InputStream(fr.read()))
@@ -30,7 +38,14 @@ if __name__ == '__main__':
 			clauses_new = clauses_new.triplesBlock()
 		print('done')
 
-
+		conn = psycopg2.connect(
+			database=database,
+			user=user,
+			password=password,
+			host=host,
+			port=port
+		)
+		
 		# creating a cursor object
 		cursor = conn.cursor()
 
