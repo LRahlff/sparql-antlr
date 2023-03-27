@@ -2,3 +2,4 @@ connection_properties.json
 gen/*
 venv/*
 .idea/*
+__pycache__/*
