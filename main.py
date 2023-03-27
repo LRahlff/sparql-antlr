@@ -20,13 +20,19 @@ import psycopg2
 # attention: grammar now changed a little
 
 if __name__ == '__main__':
-	f = open('connection_properties.json')
+	print("hello")
+	print(sys.argv)
+	f = open('../python-addon/connection_properties.json')
+	print("1")
 	data = json.load(f)
+	
+	print("2")
 	database = data['conn_details'][0]['database']
 	user = data['conn_details'][0]['user']
 	password = data['conn_details'][0]['password']
 	host = data['conn_details'][0]['host']
 	port = data['conn_details'][0]['port']
+	print("3")
 	f.close()
 	# print(sys.argv)
 	# print(len(sys.argv))
@@ -37,11 +43,13 @@ if __name__ == '__main__':
 	else:
 		query = sys.argv[1]
 
+	print("4")
 	sparql_lexer = SparqlLexer(InputStream(query))
 	sparql_tokens = CommonTokenStream(sparql_lexer)
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
 
+	print("5")
 	walker = ParseTreeWalker()
 
 
@@ -52,6 +60,7 @@ if __name__ == '__main__':
 	walker.walk(listener, start)
 
 
+	print("6")
 	# tree = myTree.forward
 	# for subj in tree:
 	# 	print(subj)
@@ -76,6 +85,7 @@ if __name__ == '__main__':
 	myTree.traverseVars()
 
 
+	print("7")
 	# print('----------------------------------')
 	# tree = myTree.forward
 	# for subj in tree:
@@ -97,14 +107,17 @@ if __name__ == '__main__':
 		port=port
 	)
 
+	print("8")
 	cursor = conn.cursor()
 
+	print("9")
 	cursor.execute("DELETE FROM new_param_id;")
 	cursor.execute("DELETE FROM new_mat_sample_id;")
 	cursor.execute("DELETE FROM new_mat_samples;")
 	cursor.execute("DELETE FROM new_value;")
 
 
+	print("10")
 
 	# cursor.execute("DROP TABLE IF EXISTS new_param_id;")
 	# cursor.execute("CREATE TABLE new_param_id (new_val_id character varying, param_id character varying);")
