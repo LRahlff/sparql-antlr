@@ -38,7 +38,7 @@ if __name__ == '__main__':
 	# print(len(sys.argv))
 	if len(sys.argv) < 2:
 		print("taking file as query")
-		with open('../../antlr/pycharm/query_new.txt', 'r') as fr:
+		with open('query_new.txt', 'r') as fr:
 			query = fr.read()
 	else:
 		query = sys.argv[1]
