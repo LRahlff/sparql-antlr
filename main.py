@@ -2,6 +2,8 @@ import json
 import re
 import sys
 
+import time
+
 from antlr4 import *
 
 from MyNode import MyNode
@@ -20,22 +22,16 @@ import psycopg2
 # attention: grammar now changed a little
 
 if __name__ == '__main__':
-	print("hello")
-	print(sys.argv)
+	start_time = time.time()
 	f = open('../python-addon/connection_properties.json')
-	print("1")
 	data = json.load(f)
-	
-	print("2")
 	database = data['conn_details'][0]['database']
 	user = data['conn_details'][0]['user']
 	password = data['conn_details'][0]['password']
 	host = data['conn_details'][0]['host']
 	port = data['conn_details'][0]['port']
-	print("3")
+
 	f.close()
-	# print(sys.argv)
-	# print(len(sys.argv))
 	if len(sys.argv) < 2:
 		print("taking file as query")
 		with open('query_new.txt', 'r') as fr:
@@ -43,15 +39,12 @@ if __name__ == '__main__':
 	else:
 		query = sys.argv[1]
 
-	print("4")
 	sparql_lexer = SparqlLexer(InputStream(query))
 	sparql_tokens = CommonTokenStream(sparql_lexer)
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
 
-	print("5")
 	walker = ParseTreeWalker()
-
 
 	myTree = MyRelationTree()
 
@@ -59,8 +52,14 @@ if __name__ == '__main__':
 
 	walker.walk(listener, start)
 
+	A_NODE = MyNode('verb', 'a')
+	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert')
+	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter')
+	HAT_NAME_NODE = MyNode('konzept', 'hat_Name')
 
-	print("6")
+	koncept_translation = {
+		'piezoelektrisches_Moment': 'piezoelektrische_Moment'
+	}
 	# tree = myTree.forward
 	# for subj in tree:
 	# 	print(subj)
@@ -85,19 +84,7 @@ if __name__ == '__main__':
 	myTree.traverseVars()
 
 
-	print("7")
-	# print('----------------------------------')
-	# tree = myTree.forward
-	# for subj in tree:
-	# 	print(subj)
-	# 	for pred in tree[subj]:
-	# 		print('    ' + str(pred))
-	# 		for obj in tree[subj][pred]:
-	# 			print('        ' + str(obj))
-
-
-
-	# print('finish')
+	calc_time_stamp = time.time()
 
 	conn = psycopg2.connect(
 		database=database,
@@ -107,28 +94,12 @@ if __name__ == '__main__':
 		port=port
 	)
 
-	print("8")
 	cursor = conn.cursor()
 
-	print("9")
 	cursor.execute("DELETE FROM new_param_id;")
 	cursor.execute("DELETE FROM new_mat_sample_id;")
 	cursor.execute("DELETE FROM new_mat_samples;")
 	cursor.execute("DELETE FROM new_value;")
-
-
-	print("10")
-
-	# cursor.execute("DROP TABLE IF EXISTS new_param_id;")
-	# cursor.execute("CREATE TABLE new_param_id (new_val_id character varying, param_id character varying);")
-	# cursor.execute("DROP TABLE IF EXISTS new_mat_sample_id;")
-	# cursor.execute("CREATE TABLE new_mat_sample_id (new_val_id character varying, mat_sample_id character varying);")
-	# cursor.execute("DROP TABLE IF EXISTS new_mat_samples;")
-	# cursor.execute("CREATE TABLE new_mat_samples (mat_sample_id character varying);")
-	# cursor.execute("DELETE FROM new_mat_samples;")
-	# cursor.execute("DROP TABLE IF EXISTS new_value;")
-	# cursor.execute("CREATE TABLE new_value (new_val_id character varying, value double precision);")
-
 
 	sql_insert_value = lambda table, val_id, obj : "INSERT INTO " + table +\
 											 " SELECT DISTINCT '" + val_id + "' AS new_val_id, " \
@@ -144,7 +115,6 @@ if __name__ == '__main__':
 														") m " \
 												"WHERE mat_sample_id LIKE '" + obj + "';"
 
-
 	new_mat = myTree.get_new_materials()
 
 	# Todo : better way, maybe with lamda function
@@ -152,54 +122,36 @@ if __name__ == '__main__':
 		cursor.execute("INSERT INTO new_mat_samples VALUES ('" + m + "') ;")
 	conn.commit()
 
-
 	new_values = myTree.get_new_params()
+
 	tree = myTree.forward
 	rev_tree = myTree.reverse
 	for new_value in new_values:
 		if tree.get(new_value) is not None:
-			node = MyNode('verb', 'a')
-			if tree[new_value].get(node) is not None:
-				for obj in tree[new_value][node]:
-					if obj.type == 'string' or obj.type == 'konzept':
+			if tree[new_value].get(A_NODE) is not None:
+				for obj in tree[new_value][A_NODE]:
+					if obj.type == 'string':
 						cursor.execute(sql_insert_value('new_param_id', new_value.name, obj.name))
+					if obj.type == 'konzept':
+						if koncept_translation.get(obj.name) is not None:
+							cursor.execute(sql_insert_value('new_param_id', new_value.name, koncept_translation[obj.name]))
+						else:
+							cursor.execute(sql_insert_value('new_param_id', new_value.name, obj.name))
 
-			node = MyNode('konzept', 'hat_Wert')
-			if tree[new_value].get(node) is not None:
-				for obj in tree[new_value][node]:
+			if tree[new_value].get(HAT_WERT_NODE) is not None:
+				for obj in tree[new_value][HAT_WERT_NODE]:
 					if obj.type == 'numeric':
 						cursor.execute("INSERT INTO new_value VALUES ('" + new_value.name + "', " + obj.name + ") ;")
 
 		if rev_tree.get(new_value) is not None:
-			node = MyNode('konzept', 'hat_Parameter')
-			if rev_tree[new_value].get(node) is not None:
-				for subrev in rev_tree[new_value][node]:
+			if rev_tree[new_value].get(HAT_PARAMETER_NODE) is not None:
+				for subrev in rev_tree[new_value][HAT_PARAMETER_NODE]:
 					if tree.get(subrev) is not None:
-						node2 = MyNode('konzept', 'hat_Name')
-						if tree[subrev].get(node2) is not None:
-							for obj2 in tree[subrev][node2]:
+						if tree[subrev].get(HAT_NAME_NODE) is not None:
+							for obj2 in tree[subrev][HAT_NAME_NODE]:
 								if obj2.type == 'string' or obj2.type == 'konzept':
 									cursor.execute(sql_insert_material('new_mat_sample_id', new_value.name, obj2.name))
 	conn.commit()
-
-	# cursor.execute("""INSERT INTO new_concr_param
-	# 					SELECT
-	# 						values.new_val_id || '_' || COALESCE(params.param_id,'undefined_parameter') || '_' || COALESCE(mat_samples.mat_sample_id, 'undefined') || '_' || values.value AS concr_param_id,
-	# 						'new_Val' AS mod_meas_id,
-	# 						COALESCE(params.param_id,'undefined_parameter') AS param_id,
-	# 						COALESCE(mat_samples.mat_sample_id, 'undefined') AS mat_sample_id,
-	# 						0 AS meas_time,
-	# 						values.value AS value
-	# 					FROM new_value values
-	# 						LEFT JOIN
-	# 						new_mat_sample_id mat_samples
-	# 							ON values.new_val_id = mat_samples.new_val_id
-	# 						LEFT JOIN
-	# 						new_param_id params
-	# 							ON values.new_val_id = params.new_val_id;""")
-	#
-	# conn.commit()
-	# print('done')
 
 	cursor.execute("REFRESH MATERIALIZED VIEW new_concr_param")
 	cursor.execute("REFRESH MATERIALIZED VIEW new_concr_param_view")
@@ -211,8 +163,9 @@ if __name__ == '__main__':
 	cursor.execute("REFRESH MATERIALIZED VIEW names")
 
 	conn.commit()
-
 	# Closing the connection
 	conn.close()
 
+	end_time = time.time()
+	print('calc_time: ' + str(calc_time_stamp - start_time) + ' , refresh_time: ' + str(end_time - calc_time_stamp))
 	print(' Ende')

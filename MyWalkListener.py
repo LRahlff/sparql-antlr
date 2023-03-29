@@ -148,32 +148,30 @@ class MyWalkListener(ParseTreeListener):
             name = name[1:]
         elif self.terminalType == 'string':
             name = name[1:-1]
-            
-        # print(' ' + str(self.searching_for))
+
         gram = self.searching_for.pop()
 
-        # print('   ' + str(self.subject) + ' ' + str(self.predicate)+ ' ' + str(self.object))
-        # match gram:
-        #     case 1:
-        #         self.subject.append(MyNode(self.terminalType, name))
-        #     case 2:
-        #         self.predicate.append(MyNode(self.terminalType, name))
-        #     case 3:
-        #         self.object.append(MyNode(self.terminalType, name))
-        #         subj = self.subject[len(self.subject)-1]
-        #         pred = self.predicate[len(self.predicate)-1]
-        #         obj = self.object[len(self.object)-1]
-        #         self.tree.add(subj, pred, obj)
+        match gram:
+            case 1:
+                self.subject.append(MyNode(self.terminalType, name))
+            case 2:
+                self.predicate.append(MyNode(self.terminalType, name))
+            case 3:
+                self.object.append(MyNode(self.terminalType, name))
+                subj = self.subject[len(self.subject)-1]
+                pred = self.predicate[len(self.predicate)-1]
+                obj = self.object[len(self.object)-1]
+                self.tree.add(subj, pred, obj)
 
-        if gram == 1:
-            self.subject.append(MyNode(self.terminalType, name))
-        elif gram == 2:
-            self.predicate.append(MyNode(self.terminalType, name))
-        elif gram == 3:
-            self.object.append(MyNode(self.terminalType, name))
-            subj = self.subject[len(self.subject)-1]
-            pred = self.predicate[len(self.predicate)-1]
-            obj = self.object[len(self.object)-1]
-            self.tree.add(subj, pred, obj)
+        # if gram == 1:
+        #     self.subject.append(MyNode(self.terminalType, name))
+        # elif gram == 2:
+        #     self.predicate.append(MyNode(self.terminalType, name))
+        # elif gram == 3:
+        #     self.object.append(MyNode(self.terminalType, name))
+        #     subj = self.subject[len(self.subject)-1]
+        #     pred = self.predicate[len(self.predicate)-1]
+        #     obj = self.object[len(self.object)-1]
+        #     self.tree.add(subj, pred, obj)
         pass
 

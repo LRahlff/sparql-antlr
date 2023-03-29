@@ -12,6 +12,11 @@ class MyRelationTree:
     def __init__(self):
         self.forward = {}
         self.reverse = {}
+        self.A_NODE = MyNode('verb', 'a')
+        self.HERKUNFT_NODE = MyNode('konzept', 'hat_Herkunft')
+        self.PARAM_NEU_NODE = MyNode('konzept', 'Parameter_Neu')
+        self.MATERIAL_NEU_NODE = MyNode('konzept', 'Material_Neu')
+        self.HAT_NAME_NODE = MyNode('konzept', 'hat_Name')
 
     def add(self, subj, pred, obj):
         privat_add(self.forward, subj, pred, obj)
@@ -35,11 +40,12 @@ class MyRelationTree:
     def search_for_new_material(self):
         new_mat = set()
         for subj in self.forward:
-            for pred in self.forward[subj]:
-                if pred.name == 'a':
-                    for obj in self.forward[subj][pred]:
-                        if obj.name == 'Material_Neu':
-                            new_mat.add(subj)
+            if self.forward[subj].get(self.HERKUNFT_NODE) is not None:
+                for obj in self.forward[subj][self.HERKUNFT_NODE]:
+                    if self.forward.get(obj) is not None:
+                        if self.forward[obj].get(self.A_NODE) is not None:
+                            if self.MATERIAL_NEU_NODE in self.forward[obj][self.A_NODE]:
+                                new_mat.add(subj)
                             # self.forward[subj][pred].remove(obj)
         return new_mat
 
@@ -49,9 +55,8 @@ class MyRelationTree:
         new_mat_set = set()
         for mat in new_material:
             if self.forward.get(mat) is not None:
-                node = MyNode('konzept', 'hat_Name')
-                if self.forward[mat].get(node) is not None:
-                    new_mat_set = new_mat_set.union(self.forward[mat][node])
+                if self.forward[mat].get(self.HAT_NAME_NODE) is not None:
+                    new_mat_set = new_mat_set.union(self.forward[mat][self.HAT_NAME_NODE])
         # return new_mat_set
         return_set = set()
         for new_mat in new_mat_set:
@@ -61,21 +66,20 @@ class MyRelationTree:
     def search_for_new_param(self):
         new_param = set()
         for subj in self.forward:
-            for pred in self.forward[subj]:
-                if pred.name == 'a':
-                    for obj in self.forward[subj][pred]:
-                        if obj.name == 'Parameter_Neu':
-                            new_param.add(subj)
-                            # self.forward[subj][pred].remove(obj)
+            if self.forward[subj].get(self.HERKUNFT_NODE) is not None:
+                for obj in self.forward[subj][self.HERKUNFT_NODE]:
+                    if self.forward.get(obj) is not None:
+                        if self.forward[obj].get(self.A_NODE) is not None:
+                            if self.PARAM_NEU_NODE in self.forward[obj][self.A_NODE]:
+                                new_param.add(subj)
+                                    # self.forward[subj][pred].remove(obj)
         return new_param
     def delete_new_param_part(self, params):
         for par in params:
             if self.forward.get(par) is not None:
-                node = MyNode('verb', 'a')
-                if self.forward[par].get(node) is not None:
-                    node2 = MyNode('konzept', 'Parameter_Neu')
-                    if node2 in self.forward[par][node]:
-                        self.forward[par][node].remove(node2)
+                if self.forward[par].get(self.HERKUNFT_NODE) is not None:
+                    if self.PARAM_NEU_NODE in self.forward[par][self.HERKUNFT_NODE]:
+                        self.forward[par][self.HERKUNFT_NODE].remove(self.PARAM_NEU_NODE)
 
     def get_new_params(self):
         new_val_param = self.search_for_new_param()
