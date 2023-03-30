@@ -115,7 +115,7 @@ class MyWalkListener(ParseTreeListener):
 
     def visitErrorNode(self, node):
         print('visitErrorNode ' + str(self.depth) + '---------------------------------')
-        print(Fore.RED + 'visitErrorNode ' + str(self.depth) + '---------------------------------' + Style.RESET_ALL)
+        # print(Fore.RED + 'visitErrorNode ' + str(self.depth) + '---------------------------------' + Style.RESET_ALL)
         self.error = True
         pass
 
