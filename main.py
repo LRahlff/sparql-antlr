@@ -24,7 +24,6 @@ import psycopg2
 if __name__ == '__main__':
 
 	sqlrequest = ""
-	start_time = time.time()
 	if len(sys.argv) < 2:
 		with open('query_new.txt', 'r') as fr:
 			query = fr.read()
@@ -54,14 +53,6 @@ if __name__ == '__main__':
 	}
 
 	myTree.traverseVars()
-
-
-	calc_time_stamp = time.time()
-
-	# cursor.execute("DELETE FROM new_param_id;")
-	# cursor.execute("DELETE FROM new_mat_sample_id;")
-	# cursor.execute("DELETE FROM new_mat_samples;")
-	# cursor.execute("DELETE FROM new_value;")
 
 	sql_insert_value = lambda table, val_id, value : "INSERT INTO " + table +\
 											 " SELECT DISTINCT '" + val_id + "' AS new_val_id, " \
@@ -122,8 +113,4 @@ if __name__ == '__main__':
 							for obj2 in tree[subrev][HAT_NAME_NODE]:
 								if obj2.type == 'string' or obj2.type == 'konzept':
 									sqlrequest += sql_insert_material('new_mat_sample_id', new_value.name, obj2.name)
-
-
-	end_time = time.time()
-	print('Ende: calc_time: ' + str(calc_time_stamp - start_time))
 	print(sqlrequest)
