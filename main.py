@@ -1,9 +1,4 @@
-import json
-import re
 import sys
-
-import time
-
 from antlr4 import *
 
 from MyNode import MyNode
@@ -11,12 +6,6 @@ from MyRelationTree import MyRelationTree
 from MyWalkListener import MyWalkListener
 from gen.SparqlLexer import SparqlLexer
 from gen.SparqlParser import SparqlParser
-
-# importing psycopg2 module
-import psycopg2
-
-
-
 
 # https://github.com/antlr/grammars-v4/blob/master/sparql/Sparql.g4
 # attention: grammar now changed a little
