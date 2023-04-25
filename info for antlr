@@ -11,3 +11,10 @@ WS
     | '\n'
     | '\r')+ ->skip
     ;
+
+
+
+
+java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:1044 -cp "/home/scarfface/Dokumente/SmaDi/Protege/testcli/lib/*:/home/scarfface/Dokumente/SmaDi/Protege/testcli/jdbc/*" -Dfile.encoding=UTF-8 -Dlogback.configurationFile="/home/scarfface/Dokumente/SmaDi/Protege/testcli/log/logback.xml" -Dlogging.config="/home/scarfface/Dokumente/SmaDi/Protege/testcli/log/logback.xml" it.unibz.inf.ontop.cli.Ontop endpoint --dev --port 8084 -m /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.obda -t /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.owl -p /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.properties --dev
+java -cp "/home/scarfface/Dokumente/SmaDi/Protege/testcli/lib/*:/home/scarfface/Dokumente/SmaDi/Protege/testcli/jdbc/*" -Dfile.encoding=UTF-8 -Dlogback.configurationFile="/home/scarfface/Dokumente/SmaDi/Protege/testcli/log/logback.xml" -Dlogging.config="/home/scarfface/Dokumente/SmaDi/Protege/testcli/log/logback.xml" it.unibz.inf.ontop.cli.Ontop endpoint --dev --port 8084 -m /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.obda -t /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.owl -p /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.properties --dev
+./ontop.cli.Ontop endpoint --dev --port 8084 -m /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.obda -t /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.owl -p /home/scarfface/Dokumente/SmaDi/smadi_prototyp/dockercomp/input/prototyp.properties --dev

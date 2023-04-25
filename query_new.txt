@@ -10,13 +10,14 @@ WHERE {
     	:hat_Wert ?v1 .
 	?phh a :Parameter_Neu.
 
-	?mat :hat_Parameter ?p1;
-		 :hat_Name ?material;
-		:hat_Herkunft ?pmh.
-	?pmh a :Material_Neu.
 
+?mat :hat_Parameter ?p1;
+		 :hat_Name ?material;
+		 :hat_Herkunft ?pmh.
+	?pmh a ?herk.
+    FILTER(?herk IN (:Material_Neu, :Material_Alt, :Probe_Alt))
 
 	FILTER(?material IN ( 'M1100' , 'M1599', 'M524.5', 'test_new_mat'))
 	FILTER(?v1 = 24)
-	FILTER(?p1n = :piezoelektrische_Moment)
+	FILTER(?p1n = :piezoelektrisches_Moment)
 }
