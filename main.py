@@ -132,7 +132,10 @@ if __name__ == '__main__':
 							for obj2 in tree[subrev][HAT_NAME_NODE]:
 								if obj2.type == 'string' or obj2.type == 'konzept':
 									material.append("('" + new_value.name + "', '" + obj2.name + "')")
-	sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "
-	sqlrequest += sql_insert_value(", ".join(values)) + " ; "
-	sqlrequest += sql_insert_material(", ".join(material)) + " ; "
+	if len(params)>0:
+		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "
+	if len(params) > 0:
+		sqlrequest += sql_insert_value(", ".join(values)) + " ; "
+	if len(params) > 0:
+		sqlrequest += sql_insert_material(", ".join(material)) + " ; "
 	print(sqlrequest)
