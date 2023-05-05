@@ -50,6 +50,7 @@ if __name__ == '__main__':
 														"(	SELECT sample_id AS mat_sample_id " \
 															"FROM sample " \
 															"UNION SELECT mat_id AS mat_sample_id FROM material " \
+															"UNION SELECT concr_component_id AS mat_sample_id FROM concr_component " \
 														") m " \
 															"ON m.mat_sample_id = new_mat.mat " \
 														"WHERE m.mat_sample_id IS NULL ; "
@@ -86,6 +87,7 @@ if __name__ == '__main__':
 													"(SELECT sample_id AS mat_sample_id FROM sample " \
 														"UNION SELECT mat_id AS mat_sample_id FROM material " \
 														"UNION SELECT mat_sample_id AS mat_sample_id FROM new_mat_samples " \
+														"UNION SELECT concr_component_id AS mat_sample_id FROM concr_component " \
 													") m " \
 													"ON m.mat_sample_id = newmat.material " +\
 													"LEFT OUTER JOIN " +\
