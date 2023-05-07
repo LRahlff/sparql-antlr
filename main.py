@@ -136,8 +136,8 @@ if __name__ == '__main__':
 									material.append("('" + new_value.name + "', '" + obj2.name + "')")
 	if len(params)>0:
 		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "
-	if len(params) > 0:
+	if len(values) > 0:
 		sqlrequest += sql_insert_value(", ".join(values)) + " ; "
-	if len(params) > 0:
+	if len(material) > 0:
 		sqlrequest += sql_insert_material(", ".join(material)) + " ; "
 	print(sqlrequest)
