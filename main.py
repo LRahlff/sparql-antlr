@@ -107,7 +107,7 @@ if __name__ == '__main__':
 													"ON m.mat_sample_id = init.material " +\
 													"LEFT OUTER JOIN " +\
 														"new_param_id valid " +\
-													"ON valid.new_val_id = newmat.new_val_id " +\
+													"ON valid.new_val_id = init.new_val_id " +\
 												"WHERE m.mat_sample_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
 
 	new_mat = myTree.get_new_materials()

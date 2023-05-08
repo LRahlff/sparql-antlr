@@ -3,20 +3,20 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
 SELECT *
 WHERE {
-	?pnew a :Ausgangsdrahtdurchmesser;
+	?pnew a :Aktuationskraft;
        :hat_Herkunft ?pnewH;
-       :hat_Wert ?valnew.
+       :hat_Wert ?val.
+
   	?pnewH a :Parameter_Neu.
 
-	?p1 a :Ausgangsquerschnitt;
-       :hat_Herkunft ?p1H;
-       :hat_Wert ?val1.
-#  	?p1H a :Parameter_Neu.
-
-  	?mat :hat_Parameter ?pnew;
-        :hat_Parameter ?p1;
+    ?p1 a :Blockierkraft;
+        :hat_Name ?p1N.
+  	?mat :hat_Parameter ?p1;
         :hat_Name ?matN.
+  	?mat2 :hat_Parameter ?pnew;
+         :hat_Name ?matN2.
 
-  FILTER(?matN = 'NiTiCu_20')
-  FILTER(?valnew = 7e-05)
+  FILTER(?matN = 'Stapelaktor')
+  FILTER(?matN2 = 'Stapelaktor_1')
+  FILTER(?val = 11000000)
 }
