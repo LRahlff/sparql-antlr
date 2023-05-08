@@ -47,13 +47,13 @@ if __name__ == '__main__':
 													"SELECT DISTINCT new_mat.mat " \
 													"FROM (VALUES " + materials + ") AS new_mat (mat) " \
 														"LEFT OUTER JOIN  " \
-														"(	SELECT sample_id AS mat_sample_id " \
+														"(	SELECT sample_id AS name " \
 															"FROM sample " \
-															"UNION SELECT mat_id AS mat_sample_id FROM material " \
-															"UNION SELECT concr_component_id AS mat_sample_id FROM concr_component " \
+															"UNION SELECT mat_name AS name FROM material " \
+															"UNION SELECT component_name AS name FROM component " \
 														") m " \
-															"ON m.mat_sample_id = new_mat.mat " \
-														"WHERE m.mat_sample_id IS NULL ; "
+															"ON m.name = new_mat.mat " \
+														"WHERE m.name IS NULL ; "
 
 	sql_insert_param_id = lambda new_params: "INSERT INTO new_param_id " +\
 												"SELECT DISTINCT " +\
@@ -81,15 +81,30 @@ if __name__ == '__main__':
 												"SELECT DISTINCT " +\
 												"valid.new_val_id, " +\
 												"m.mat_sample_id " +\
-												"FROM  " +\
-													"(VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
+												"FROM " +\
+													"(SELECT DISTINCT newmat.new_val_id, COALESCE(nam.mat_sample_id, newmat.material) AS material FROM (VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
+													"LEFT JOIN ( " +\
+														"SELECT sample_id AS mat_sample_id, " +\
+														"sample_id AS name " +\
+														"FROM sample " +\
+														"UNION SELECT mat_id AS mat_sample_id, " +\
+														"mat_name AS name " +\
+														"FROM material " +\
+														"UNION SELECT concr_component.concr_component_id AS mat_sample_id, " +\
+														"component_name AS name " +\
+														"FROM concr_component " +\
+														"LEFT JOIN component " +\
+															"ON concr_component.component_id = component.component_id " +\
+														") nam " +\
+														"ON newmat.material = nam.name " +\
+													") init " +\
 													"LEFT OUTER JOIN  " \
 													"(SELECT sample_id AS mat_sample_id FROM sample " \
 														"UNION SELECT mat_id AS mat_sample_id FROM material " \
 														"UNION SELECT mat_sample_id AS mat_sample_id FROM new_mat_samples " \
 														"UNION SELECT concr_component_id AS mat_sample_id FROM concr_component " \
 													") m " \
-													"ON m.mat_sample_id = newmat.material " +\
+													"ON m.mat_sample_id = init.material " +\
 													"LEFT OUTER JOIN " +\
 														"new_param_id valid " +\
 													"ON valid.new_val_id = newmat.new_val_id " +\
