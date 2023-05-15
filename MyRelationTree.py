@@ -12,11 +12,13 @@ class MyRelationTree:
     def __init__(self):
         self.forward = {}
         self.reverse = {}
-        self.A_NODE = MyNode('verb', 'a')
-        self.HERKUNFT_NODE = MyNode('konzept', 'hat_Herkunft')
-        self.PARAM_NEU_NODE = MyNode('konzept', 'Parameter_Neu')
-        self.MATERIAL_NEU_NODE = MyNode('konzept', 'Material_Neu')
-        self.HAT_NAME_NODE = MyNode('konzept', 'hat_Name')
+        self.A_NODE = MyNode('verb', 'a', False)
+        self.CORRESPONDS_NODE = MyNode('konzept', 'korrespondiert_mit', False)
+        # self.HERKUNFT_NODE = MyNode('konzept', 'hat_Herkunft', False)
+        self.PARAM_NODE = MyNode('konzept', 'Parameter', True)
+        self.MATERIAL_NODE = MyNode('konzept', 'Material', True)
+        self.HAT_NAME_NODE = MyNode('konzept', 'hat_Name', False)
+        self.HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
 
     def add(self, subj, pred, obj):
         privat_add(self.forward, subj, pred, obj)
@@ -40,13 +42,12 @@ class MyRelationTree:
     def search_for_new_material(self):
         new_mat = set()
         for subj in self.forward:
-            if self.forward[subj].get(self.HERKUNFT_NODE) is not None:
-                for obj in self.forward[subj][self.HERKUNFT_NODE]:
-                    if self.forward.get(obj) is not None:
-                        if self.forward[obj].get(self.A_NODE) is not None:
-                            if self.MATERIAL_NEU_NODE in self.forward[obj][self.A_NODE]:
-                                new_mat.add(subj)
-                            # self.forward[subj][pred].remove(obj)
+            if self.forward[subj].get(self.A_NODE) is not None:
+                if self.forward[subj].get(self.HAT_PARAMETER_NODE) is not None:
+                    for obj in self.forward[subj][self.A_NODE]:
+                        if obj.new: # and obj.__eq__(self.MATERIAL_NODE)
+                            new_mat.add(subj)
+                        # self.forward[subj][pred].remove(obj)
         return new_mat
 
 
@@ -63,25 +64,32 @@ class MyRelationTree:
             return_set.add(new_mat.name)
         return return_set
 
-    def search_for_new_param(self):
+    def search_for_new_param(self, translation):
         new_param = set()
         for subj in self.forward:
-            if self.forward[subj].get(self.HERKUNFT_NODE) is not None:
-                for obj in self.forward[subj][self.HERKUNFT_NODE]:
-                    if self.forward.get(obj) is not None:
-                        if self.forward[obj].get(self.A_NODE) is not None:
-                            if self.PARAM_NEU_NODE in self.forward[obj][self.A_NODE]:
-                                new_param.add(subj)
-                                    # self.forward[subj][pred].remove(obj)
+            if self.forward[subj].get(self.A_NODE) is not None:
+                for obj in self.forward[subj][self.A_NODE]:
+                    if obj.name in translation and subj.new:
+                        new_param.add(subj)
         return new_param
-    def delete_new_param_part(self, params):
-        for par in params:
-            if self.forward.get(par) is not None:
-                if self.forward[par].get(self.HERKUNFT_NODE) is not None:
-                    if self.PARAM_NEU_NODE in self.forward[par][self.HERKUNFT_NODE]:
-                        self.forward[par][self.HERKUNFT_NODE].remove(self.PARAM_NEU_NODE)
 
-    def get_new_params(self):
-        new_val_param = self.search_for_new_param()
-        self.delete_new_param_part(new_val_param)
+    def search_for_correspondings(self):
+        new_cores = set()
+        for subj in self.forward:
+            if self.forward[subj].get(self.CORRESPONDS_NODE) is not None:
+                for obj in self.forward[subj][self.CORRESPONDS_NODE]:
+                    if subj.new:
+                        new_cores.add(subj)
+        return new_cores
+
+    # def delete_new_param_part(self, params):
+    #     for par in params:
+    #         if self.forward.get(par) is not None:
+    #             if self.forward[par].get(self.A_NODE) is not None:
+    #                 if self.PARAM_NODE in self.forward[par][self.A_NODE]:
+    #                     self.forward[par][self.HERKUNFT_NODE].remove(self.PARAM_NODE)
+
+    def get_new_params(self, translation):
+        new_val_param = self.search_for_new_param(translation)
+        # self.delete_new_param_part(new_val_param)
         return new_val_param

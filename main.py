@@ -32,13 +32,166 @@ if __name__ == '__main__':
 
 	walker.walk(listener, start)
 
-	A_NODE = MyNode('verb', 'a')
-	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert')
-	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter')
-	HAT_NAME_NODE = MyNode('konzept', 'hat_Name')
+	A_NODE = MyNode('verb', 'a', False)
+	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert', False)
+	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
+	HAT_NAME_NODE = MyNode('konzept', 'hat_Name', False)
+	CORRESPONDS_NODE = MyNode('konzept', 'korrespondiert_mit', False)
 
 	koncept_translation = {
-		'piezoelektrisches_Moment': 'piezoelektrische_Moment'
+		'Frequenz': 'Frequenz',
+		'Aktivierungsleistung': 'Aktivierungsleistung',
+		'Aktivierungszeit': 'Aktivierungszeit',
+		'Biegesteifigkeit': 'Biegesteifigkeit',
+		'Blockierkraft': 'Blockierkraft',
+		'Einzeldrahtwiderstand': 'Einzeldrahtwiderstand',
+		'elektrische_Kapazitaet': 'elektrische_Kapazitaet',
+		'elektrischer_Widerstand': 'elektrischer_Widerstand',
+		# 'freie_Dehnung': 'freie_Dehnung',
+		'freie_Streckung': 'freie_Streckung',
+		'freier_Hub': 'freier_Hub',
+		'mechanische_Bewegung': 'mechanische_Bewegung',
+		'neutrale_Faserlage': 'neutrale_Faserlage',
+		'piezoelektrisches_Moment': 'piezoelektrische_Moment',
+		'Dichte': 'Dichte',
+		'elektrisches_Flaechenverhaeltnis': 'elektrisches_Flaechenverhaeltnis',
+		'Emissionsgrad': 'Emissionsgrad',
+		'Aktuationsquerschnitt': 'Aktuationsquerschnitt',
+		'Ausgangsbreite': 'Ausgangsbreite',
+		'Ausgangsdicke': 'Ausgangsdicke',
+		'Ausgangselektrodendicke': 'Ausgangselektrodendicke',
+		'Ausgangslaenge': 'Ausgangslaenge',
+		'Ausgangsdrahtlaenge': 'Ausgangsdrahtlaenge',
+		'Ausgangsquerschnitt': 'Ausgangsquerschnitt',
+		'Ausgangswandlerhoehe': 'Ausgangswandlerhoehe',
+		'Breite': 'Breite',
+		'Dicke': 'Dicke',
+		'Drahtdurchmesser': 'Drahtdurchmesser',
+		'Ausgangsdrahtdurchmesser': 'Ausgangsdrahtdurchmesser',
+		# 'Ausgangsdrahtlaenge': 'Ausgangsdrahtlaenge',
+		# 'Ausgangsquerschnitt': 'Ausgangsquerschnitt',
+		'Flaeche': 'Flaeche',
+		'Hoehe': 'Hoehe',
+		'Laenge': 'Laenge',
+		'lineare_Abmessung': 'lineare_Abmessung',
+		'Oberflaeche': 'Oberflaeche',
+		'Schichtanzahl': 'Schichtanzahl',
+		'Wandlerhoehe': 'Wandlerhoehe',
+		'Halteleistung': 'Halteleistung',
+		'Masse': 'Masse',
+		'Ader-Abhaengigkeitsparameter': 'Ader-Abhaengigkeitsparameter',
+		'Anisotropie': 'Anisotropie',
+		'Anisotropiefeld': 'Anisotropiefeld',
+		'Curie_Temperatur': 'Curie_Temperatur',
+		'Dehnung_Uebergang_1': 'Dehnung_Uebergang_1',
+		'Dehnung_Uebergang_2': 'Dehnung_Uebergang_2',
+		'maximale_Dehnung': 'maximale_Dehnung',
+		'maximale_Dehnung_im_Magnetfeld': 'maximale_Dehnung_im_Magnetfeld',
+		'Maximale_Phasentransformationsdehnung': 'Maximale_Phasentransformationsdehnung',
+		'Plateau-Start-Dehnung': 'Anfangsdehnung_fuer_quasi-plastische_Verformung', # Dehnung_Uebergang_1?
+		'Plateau-Finish-Dehnung': 'Enddehnung_fuer_quasi-plastische_Verformung', # Dehnung_Uebergang_2?
+		'Durchbruchfeldstaerke': 'Durchbruchfeldstaerke',
+		'E-Modul_fuer_Austenit': 'E-Modul_fuer_Austenit',
+		'E-Modul_fuer_Austenit_elastisch': 'E-Modul_fuer_Austenit_elastisch',
+		'E-Modul_fuer_Austenit_pseudoplastisch': 'E-Modul_fuer_Austenit_pseudoplastisch',
+		'E-Modul_fuer_Martensit': 'E-Modul_fuer_Martensit',
+		'E-Modul_fuer_Martensit_elastisch': 'E-Modul_fuer_Martensit_elastisch', # Modul_fuer_Martensit
+		'E-Modul_fuer_Martensit_pseudoplastisch': 'E-Modul_fuer_Martensit_pseudoplastisch',
+		'Elastizitaetsmodul': 'Elastizitaetsmodul',
+		'Elastizitaetsmodul_nach_Neo_Hookean': 'Elastizitaetsmodul_nach_Neo_Hookean',
+		'Elastizitaetsmodul_nach_Yeoh_1': 'Elastizitaetsmodul_nach_Yeoh_1',
+		'Elastizitaetsmodul_nach_Yeoh_2': 'Elastizitaetsmodul_nach_Yeoh_2',
+		'Elastizitaetsmodul_nach_Yeoh_3': 'Elastizitaetsmodul_nach_Yeoh_3',
+		'elektrische_Permittivitaet_bei_konstanter_mechanischer_Dehnung': 'C10',
+		'elektrische_Permittivitaet_bei_konstanter_mechanischer_Spannung': 'C00',
+		'inverse_elektrische_Permittivitaet_bei_konstanter_mechanischer_Dehnung': 'C11',
+		'inverse_elektrische_Permittivitaet_bei_konstanter_mechanischer_Spannung': 'C01',
+		'Gitterkonstante_a': 'Gitterkonstante_a',
+		'Gitterkonstante_b': 'Gitterkonstante_b',
+		'Gitterkonstante_c': 'Gitterkonstante_c',
+		'Kristallstruktur': 'Kristallstruktur',
+		'magnetische_Anisotropiekonstante': 'magnetische_Anisotropiekonstante',
+		'Martensitgehalt': 'Martensitgehalt',
+		'maximale_Blockierspannung': 'maximale_Blockierspannung',
+		'maximale_Blockierspannung_entlastet': 'maximale_Blockierspannung_entlastet',
+		'maximale_Blockierspannung_belastet': 'maximale_Blockierspannung_belastet',
+		'maximale_Einsatztemperatur': 'maximale_Einsatztemperatur',
+		'maximale_Spannung': 'maximale_Spannung',
+		'mechanische_Nachgiebigkeit_bei_konstantem_elektrischen_Feld': 'A00',
+		'mechanische_Nachgiebigkeit_bei_konstanter_elektrischer_Flussdichte': 'A01',
+		'Austenit-Finish-Spannung_bei_pseudoelastischer_Verformung': 'Austenit-Finish-Spannung_bei_pseudoelastischer_Verformung',
+		'Austenit-Start-Spannung_bei_pseudoelastischer_Verformung': 'Austenit-Start-Spannung_bei_pseudoelastischer_Verformung',
+		'Martensit-Finish-Spannung_bei_pseudoelastischer_Verformung': 'Martensit-Finish-Spannung_bei_pseudoelastischer_Verformung',
+		'Martensit-Start-Spannung_bei_pseudoelastischer_Verformung': 'Martensit-Start-Spannung_bei_pseudoelastischer_Verformung',
+		'maximal_magnetische_Spannung': 'maximale_magnetische_Spannung',
+		'Plateau-Finish-Spannung': 'Endspannung_fuer_quasi-plastische_Verformung',
+		'Plateau-Start-Spannung': 'Anfangsspannung_fuer_quasi-plastische_Verformung',
+		'Spannung_Uebergang_1': 'Spannung_Uebergang_1', # Plateau-Start-Spannung
+		'Spannung_Uebergang_2': 'Spannung_Uebergang_2', # Plateau-Finish-Spannung
+		'mechanische_Steifigkeit_bei_konstantem_elektrischem_Feld': 'A10',
+		'mechanische_Steifigkeit_bei_konstanter_elektrischer_Flussdichte': 'A11',
+		'relative_Permeabilitaet': 'relative_Permeabilitaet',
+		'Austenit_Finish_Temperatur': 'Austenit_Finish_Temperatur',
+		'Austenit_Start_Temperatur': 'Austenit_Start_Temperatur',
+		'Martensit_Finish_Temperatur': 'Martensit_Finish_Temperatur',
+		'Martensit_Start_Temperatur': 'Martensit_Start_Temperatur',
+		'piezoelektrische_Dehnungskonstante': 'B10',
+		'piezoelektrische_Ladungskonstante': 'B00',
+		'piezoelektrische_Spannungskonstante': 'B01',
+		'Poissonzahl': 'Poissonzahl',
+		'relative_Permittivitaet': 'relative_Permittivitaet',
+		'Saettigungspolarisation': 'Saettigungspolarisation',
+		'schwere_Achse': 'schwere_Achse',
+		'spezifischer_elektrischer_Widerstand': 'spezifischer_elektrischer_Widerstand',
+		'spezifischer_elektrischer_Widerstand_Durchschnitt': 'spezifischer_elektrischer_Widerstand_Durchschnitt',
+		'spezifischer_elektrischer_Widerstand_T1': 'spezifischer_elektrischer_Widerstand_T1',
+		'spezifischer_elektrischer_Widerstand_T2': 'spezifischer_elektrischer_Widerstand_T2',
+		'spezifischer_Widerstand_fuer_Austenit': 'spezifischer_Widerstand_fuer_Austenit',
+		'spezifischer_Widerstand_fuer_Martensit': 'spezifischer_Widerstand_fuer_Martensit',
+		'Temperatur-Skalierungsparameter': 'Temperatur-Skalierungsparameter',
+		'Temperaturgradient_fuer_Austenit': 'Temperaturgradient_fuer_Austenit',
+		'Temperaturgradient_fuer_Martensit': 'Temperaturgradient_fuer_Martensit',
+		'Transformationsenthalpie': 'Transformationsenthalpie',
+		'Transformationstemperatur': 'Transformationstemperatur',
+		'Waermekapazitaet': 'Waermekapazitaet',
+		'Waermeleitfaehigkeit': 'Waermeleitfaehigkeit',
+		'Waermeuebergangskoeffizient': 'Waermeuebergangskoeffizient',
+		'Zwillingsspannung': 'Zwillingsspannung',
+		# 'Ausgangsdicke': 'Ausgangsdicke',
+		'Permeabilitaet_im_Vakuum': 'Permeabilitaet_im_Vakuum',
+		'Permitivitaet_im_Vakuum': 'Permitivitaet_im_Vakuum',
+		'Volumenausdehnungskoeffizient_fuer_Austenit': 'Volumenausdehnungskoeffizient_Austenit',
+		'Volumenausdehnungskoeffizient_Martensit': 'Volumenausdehnungskoeffizient_fuer_Martensit',
+		'Umgebungstemperatur': 'Umgebungstemperatur',
+		'Referenztemperatur': 'Referenztemperatur',
+		'Dehnung': 'Dehnung',
+		'Dehnung_Everett': 'Dehnung_Everett',
+		'Dehnung_FORC': 'Dehnung_FORC',
+		'elektrische_Feldstaerke': 'elektrische_Feldstaerke',
+		'elektrische_Flussdichte': 'elektrische_Flussdichte',
+		'elektrische_Spannung': 'elektrische_Spannung',
+		'Betriebsspannung': 'Betriebsspannung',
+		'Multilayer-Lagenspannung': 'Multilayer-Lagenspannung',
+		'elektrostatischer_Druck': 'elektrostatischer_Druck',
+		'Hub': 'Hub',
+		'Aktuationskraft': 'Aktuationskraft',
+		'Kraft': 'Kraft',
+		'magnetische_Feldenergiedichte': 'magnetische_Feldenergiedichte',
+		'magnetische_Feldstaerke': 'magnetische_Feldstaerke',
+		'magnetische_Flussdichte': 'magnetische_Flussdichte',
+		'magnetische_Polarisierung': 'magnetische_Polarisierung',
+		'magnetische_Spannung_alpha': 'magnetische_Spannung_alpha',
+		'magnetische_Spannung_beta': 'magnetische_Spannung_beta',
+		'Magnetisierung': 'Magnetisierung',
+		'phasenspezifischer_Widerstandstemperaturkoeffizient_A': 'phas_Wider_Temp_Koeff_A',
+		'phasenspezifischer_Widerstandstemperaturkoeffizient_M': 'phas_Wider_Temp_Koeff_M',
+		'magnetische_Spannung': 'magnetische_Spannung',
+		'mechanische_Spannung': 'mechanische_Spannung',
+		'Streckung': 'Streckung',
+		'Temperatur': 'Temperatur',
+		'Temperaturabh_spez_elektr_Widerstand': 'temp_abh_spez_el_Widerstand',
+		'thermischer_Einfluss': 'thermischer_Einfluss',
+		'Parameter': 'undefined'
 	}
 
 	myTree.traverseVars()
@@ -110,6 +263,20 @@ if __name__ == '__main__':
 													"ON valid.new_val_id = init.new_val_id " +\
 												"WHERE m.mat_sample_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
 
+	sql_insert_correspondings = lambda new_corres: "INSERT INTO new_corresponds " +\
+												"SELECT DISTINCT " +\
+												"valid.new_val_id, " +\
+												"valid2.new_val_id " +\
+												"FROM  " +\
+													"(VALUES " + new_corres + ") AS newcor (first, sec) " +\
+													"LEFT OUTER JOIN " +\
+													"new_param_id valid " +\
+													"ON valid.new_val_id = newcor.first " +\
+													"LEFT OUTER JOIN " +\
+													"new_param_id valid2 " +\
+													"ON valid2.new_val_id = newcor.sec " +\
+												"WHERE valid.new_val_id IS NOT NULL AND valid2.new_val_id IS NOT NULL"
+
 	new_mat = myTree.get_new_materials()
 
 	# Todo : better way, maybe with lamda function
@@ -117,7 +284,7 @@ if __name__ == '__main__':
 		materials = "('" + "'), ('".join(new_mat) + "')"
 		sqlrequest += sql_insert_new_material(materials)
 
-	new_values = myTree.get_new_params()
+	new_values = myTree.get_new_params(koncept_translation)
 
 	tree = myTree.forward
 	rev_tree = myTree.reverse
@@ -149,10 +316,21 @@ if __name__ == '__main__':
 							for obj2 in tree[subrev][HAT_NAME_NODE]:
 								if obj2.type == 'string' or obj2.type == 'konzept':
 									material.append("('" + new_value.name + "', '" + obj2.name + "')")
+	corres = myTree.search_for_correspondings()
+	correspon = []
+	for co in corres:
+		if tree.get(co) is not None:
+			if tree[co].get(CORRESPONDS_NODE) is not None:
+				for co2 in tree[co][CORRESPONDS_NODE]:
+					correspon.append("('" + co.name + "', '" + co2.name + "')")
+
+
 	if len(params)>0:
 		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "
 	if len(values) > 0:
 		sqlrequest += sql_insert_value(", ".join(values)) + " ; "
 	if len(material) > 0:
 		sqlrequest += sql_insert_material(", ".join(material)) + " ; "
+	if len(correspon) > 0:
+		sqlrequest += sql_insert_correspondings(", ".join(correspon)) + " ; "
 	print(sqlrequest)

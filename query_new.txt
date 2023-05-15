@@ -3,20 +3,54 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
 SELECT *
 WHERE {
+    # update_new
 	?pnew a :Aktuationskraft;
-       :hat_Herkunft ?pnewH;
        :hat_Wert ?val.
 
-  	?pnewH a :Parameter_Neu.
+  FILTER(?val = 11000000)
+	?pnew2 a :Streckung;
+	    :korrespondiert_mit ?pnew;
+       :hat_Wert ?val2.
+	?pnew3 a :Aktuationskraft;
+	    :korrespondiert_mit ?pnew4;
+	    :korrespondiert_mit ?pnew5;
+       :hat_Wert ?val3.
+
+	?pnew4 a :Streckung;
+       :hat_Wert ?val2.
+
+	?pnew5 a :Laenge;
+       :hat_Wert ?val5.
+
+	?pnew6 a :Hub;
+       :hat_Wert ?val6.
+
+	?pnew7 a :Breite;
+       :hat_Wert ?val7.
+
+	?pnew8 a :Dehnung;
+       :hat_Wert ?val8.
+  	# update_end
 
     ?p1 a :Blockierkraft;
-        :hat_Name ?p1N.
+        :hat_Name ?p1N;
+        :hat_Wert ?val1.
   	?mat :hat_Parameter ?p1;
-        :hat_Name ?matN.
-  	?mat2 :hat_Parameter ?pnew;
-         :hat_Name ?matN2.
+        :hat_Name ?matN;
+        :hat_Parameter ?pnew;
+        :hat_Parameter ?pnew2;
+        :hat_Parameter ?pnew3;
+        :hat_Parameter ?pnew4;
+        :hat_Parameter ?pnew5;
+        :hat_Parameter ?pnew6;
+        :hat_Parameter ?pnew7;
 
   FILTER(?matN = 'Stapelaktor')
-  FILTER(?matN2 = 'Stapelaktor_1')
-  FILTER(?val = 11000000)
+  FILTER(?val2 = 1)
+  FILTER(?val3 = 10000000)
+  FILTER(?val5 = 56)
+  FILTER(?val6 = 7)
+  FILTER(?val7 = 8)
+  FILTER(?val8 = 9)
+
 }

@@ -18,8 +18,7 @@ class MyWalkListener(ParseTreeListener):
         self.object = [None]
         self.searching_for = []
         self.lastListNode = []
-        self.new_Params = set()
-        self.new_Material = set()
+        self.update_mode_is_set = False
 
     def exitEveryRule(self, ctx):
         self.depth -= 1
@@ -65,6 +64,14 @@ class MyWalkListener(ParseTreeListener):
 
     def enterEveryRule(self, ctx):
         self.depth += 1
+        # pre = ''
+        # i = 0
+        # while(i< self.depth):
+        #     pre = pre + '  '
+        #     i = i+1
+        # print(pre + ctx.getText())
+        # if isinstance(ctx, SparqlParser.TriplesBlockMyContext):
+        #     print("YEA")
         if isinstance(ctx, SparqlParser.TriplesSameSubjectContext):
             # self.searching_for.append(3)
             # self.searching_for.append(2)
@@ -105,12 +112,6 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'numeric'
             return
-
-
-
-        # if isinstance(ctx, SparqlParser.TriplesSameSubjectContext):
-        #     pass
-        # print('enterEveryRule ' + str(self.depth) + ' ' + ctx.getText())
         pass
 
     def visitErrorNode(self, node):
@@ -123,16 +124,17 @@ class MyWalkListener(ParseTreeListener):
         # print('TerminalNode   ' + str(self.depth) + ' ' + node.getText())
 
         name = node.getText()
-        ignore = {'.', '(' , ')', 'FILTER', ';'}
+        ignore = {'.', '(', ')', 'FILTER', ';'}
         if name in ignore:
             # print("nothing here to check for")
             return
-        # if name == ';' and self.lastListNode[len(self.lastListNode)-1] == 'PropertyListNotEmptyContext':
-        #     self.predicate.pop()
-        #     self.object.pop()
-        #     self.searching_for.append(3)
-        #     self.searching_for.append(2)
-        #     return
+
+        if name == '# update_new':
+            self.update_mode_is_set = True
+            return
+        if name == '# update_end':
+            self.update_mode_is_set = False
+            return
 
         if name == ',' and self.lastListNode[len(self.lastListNode)-1] == 'RelationalExpressionContext':
             self.object.pop()
@@ -153,25 +155,15 @@ class MyWalkListener(ParseTreeListener):
 
         match gram:
             case 1:
-                self.subject.append(MyNode(self.terminalType, name))
+                self.subject.append(MyNode(self.terminalType, name, self.update_mode_is_set))
             case 2:
-                self.predicate.append(MyNode(self.terminalType, name))
+                self.predicate.append(MyNode(self.terminalType, name, self.update_mode_is_set))
             case 3:
-                self.object.append(MyNode(self.terminalType, name))
+                self.object.append(MyNode(self.terminalType, name, self.update_mode_is_set))
                 subj = self.subject[len(self.subject)-1]
                 pred = self.predicate[len(self.predicate)-1]
                 obj = self.object[len(self.object)-1]
                 self.tree.add(subj, pred, obj)
 
-        # if gram == 1:
-        #     self.subject.append(MyNode(self.terminalType, name))
-        # elif gram == 2:
-        #     self.predicate.append(MyNode(self.terminalType, name))
-        # elif gram == 3:
-        #     self.object.append(MyNode(self.terminalType, name))
-        #     subj = self.subject[len(self.subject)-1]
-        #     pred = self.predicate[len(self.predicate)-1]
-        #     obj = self.object[len(self.object)-1]
-        #     self.tree.add(subj, pred, obj)
         pass
 

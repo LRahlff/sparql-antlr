@@ -1,9 +1,12 @@
 class MyNode:
-    def __init__(self, type, name):
+    def __init__(self, type, name, new):
         self.type = type
         self.name = name
+        self.new = new
 
     def __eq__(self, other):
+        # if self.type == 'konzept' and (self.name == 'Parameter' or self.name == 'Material'):
+        #     return self.type == other.type and self.name == other.name and self.new == other.new
         return self.type == other.type and self.name == other.name
 
     def __hash__(self):

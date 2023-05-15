@@ -115,11 +115,19 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' a=triplesBlock? ( ( b=graphPatternNotTriples | c=filter_ ) d='.'? e=triplesBlock? )* '}'
+    : '{' a=triplesBlockMy? (( b=graphPatternNotTriplesMy | c=filter_My ) d='.'? e=triplesBlockMy? )* '}'
+    ;
+
+triplesBlockMy
+    : compiler_set? triplesBlock compiler_set?
     ;
 
 triplesBlock
-    : triplesSameSubject ( '.' triplesBlock? )?
+    : triplesSameSubjectMy ( '.' triplesBlock? )?
+    ;
+
+graphPatternNotTriplesMy
+    : compiler_set? graphPatternNotTriples compiler_set?
     ;
 
 graphPatternNotTriples
@@ -138,6 +146,10 @@ graphGraphPattern
 
 groupOrUnionGraphPattern
     : groupGraphPattern ( ('UNION'|'union') groupGraphPattern )*
+    ;
+
+filter_My
+    : compiler_set? filter_ compiler_set?
     ;
 
 filter_
@@ -163,7 +175,12 @@ constructTemplate
     ;
 
 constructTriples
-    : triplesSameSubject ( '.' constructTriples? )?
+    : triplesSameSubjectMy ( '.' constructTriples? )?
+    ;
+
+
+triplesSameSubjectMy
+    : compiler_set? triplesSameSubject compiler_set?
     ;
 
 triplesSameSubject
@@ -364,6 +381,10 @@ blankNode
     | ANON
     ;
 
+compiler_set
+    : COM_UP_START
+    | COM_UP_END;
+
 // LEXER RULES
 
 IRI_REF
@@ -512,6 +533,10 @@ fragment
 DIGIT
     : '0'..'9'
     ;
+
+
+COM_UP_START: '# update_new';
+COM_UP_END: '# update_end';
 
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 LINE_COMMENT:       '#' ~[\r\n]*    -> channel(HIDDEN);
