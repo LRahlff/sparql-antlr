@@ -129,10 +129,10 @@ class MyWalkListener(ParseTreeListener):
             # print("nothing here to check for")
             return
 
-        if name == '# update_new':
+        if name == '#update_new':
             self.update_mode_is_set = True
             return
-        if name == '# update_end':
+        if name == '#update_end':
             self.update_mode_is_set = False
             return
 

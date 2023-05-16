@@ -383,7 +383,8 @@ blankNode
 
 compiler_set
     : COM_UP_START
-    | COM_UP_END;
+    | COM_UP_END
+    | LINE_COMMENT;
 
 // LEXER RULES
 
@@ -534,9 +535,8 @@ DIGIT
     : '0'..'9'
     ;
 
-
-COM_UP_START: '# update_new';
-COM_UP_END: '# update_end';
+COM_UP_START: '#update_new';
+COM_UP_END: '#update_end';
 
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 LINE_COMMENT:       '#' ~[\r\n]*    -> channel(HIDDEN);
