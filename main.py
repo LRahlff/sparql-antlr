@@ -238,16 +238,14 @@ if __name__ == '__main__':
 													"(SELECT DISTINCT newmat.new_val_id, COALESCE(nam.mat_sample_id, newmat.material) AS material FROM (VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
 													"LEFT JOIN ( " +\
 														"SELECT sample_id AS mat_sample_id, " +\
-														"sample_id AS name " +\
+														"sample_name AS name " +\
 														"FROM sample " +\
 														"UNION SELECT mat_id AS mat_sample_id, " +\
 														"mat_name AS name " +\
 														"FROM material " +\
 														"UNION SELECT concr_component.concr_component_id AS mat_sample_id, " +\
-														"component_name AS name " +\
+														"concr_component.concr_component_name AS name " +\
 														"FROM concr_component " +\
-														"LEFT JOIN component " +\
-															"ON concr_component.component_id = component.component_id " +\
 														") nam " +\
 														"ON newmat.material = nam.name " +\
 													") init " +\
@@ -263,6 +261,7 @@ if __name__ == '__main__':
 													"ON valid.new_val_id = init.new_val_id " +\
 												"WHERE m.mat_sample_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
 
+	# Todo: add only correspondance if they correscpnd: if the are the same material.
 	sql_insert_correspondings = lambda new_corres: "INSERT INTO new_corresponds " +\
 												"SELECT DISTINCT " +\
 												"valid.new_val_id, " +\

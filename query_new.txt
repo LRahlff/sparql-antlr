@@ -1,35 +1,29 @@
 PREFIX : <urn:absolute/prototyp#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-SELECT *
+SELECT ?p1 ?p1N ?val1 ?matN
 WHERE {
     # update_new
-	?pnew a :Aktuationskraft;
-       :hat_Wert ?val.
+	?pnew1 a :Aktuationskraft;
+       :hat_Wert ?val1.
 
-  FILTER(?val = 11000000)
 	?pnew2 a :Streckung;
-	    :korrespondiert_mit ?pnew;
+	    :korrespondiert_mit ?pnew1;
        :hat_Wert ?val2.
 	?pnew3 a :Aktuationskraft;
 	    :korrespondiert_mit ?pnew4;
 	    :korrespondiert_mit ?pnew5;
+	    :korrespondiert_mit ?pnew6;
        :hat_Wert ?val3.
 
 	?pnew4 a :Streckung;
        :hat_Wert ?val2.
 
-	?pnew5 a :Laenge;
+	?pnew5 a :elektrische_Feldstaerke;
        :hat_Wert ?val5.
-
-	?pnew6 a :Hub;
+	?pnew6 a :Durchbruchfeldstaerke;
        :hat_Wert ?val6.
 
-	?pnew7 a :Breite;
-       :hat_Wert ?val7.
-
-	?pnew8 a :Dehnung;
-       :hat_Wert ?val8.
   	# update_end
 
     ?p1 a :Blockierkraft;
@@ -37,20 +31,19 @@ WHERE {
         :hat_Wert ?val1.
   	?mat :hat_Parameter ?p1;
         :hat_Name ?matN;
-        :hat_Parameter ?pnew;
+        :hat_Parameter ?pnew1;
         :hat_Parameter ?pnew2;
         :hat_Parameter ?pnew3;
         :hat_Parameter ?pnew4;
         :hat_Parameter ?pnew5;
         :hat_Parameter ?pnew6;
-        :hat_Parameter ?pnew7;
 
-  FILTER(?matN = 'Stapelaktor')
+  FILTER(?matN = 'Stapelaktor_1')
+  FILTER(?val1 = 2.3)
   FILTER(?val2 = 1)
-  FILTER(?val3 = 10000000)
-  FILTER(?val5 = 56)
-  FILTER(?val6 = 7)
-  FILTER(?val7 = 8)
-  FILTER(?val8 = 9)
+  FILTER(?val3 = 2.35)
+  FILTER(?val5 = 0)
+  FILTER(?val6 = 1000000)
+
 
 }
