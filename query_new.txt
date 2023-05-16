@@ -3,7 +3,7 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
 SELECT ?p1 ?p1N ?val1 ?matN
 WHERE {
-    #update_new
+    #* update_new
 	?pnew1 a :Aktuationskraft;
        :hat_Wert ?val1.
 
@@ -24,7 +24,7 @@ WHERE {
 	?pnew6 a :Durchbruchfeldstaerke;
        :hat_Wert ?val6.
 
-  	# update_end
+  	#* update_end
 
     ?p1 a :Blockierkraft;
         :hat_Name ?p1N;

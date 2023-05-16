@@ -112,6 +112,14 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'numeric'
             return
+        if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
+            name = ctx.getText()
+            if name == 'update_end':
+                self.update_mode_is_set = True
+                return
+            if name == 'update_end':
+                self.update_mode_is_set = False
+                return
         pass
 
     def visitErrorNode(self, node):
@@ -127,13 +135,6 @@ class MyWalkListener(ParseTreeListener):
         ignore = {'.', '(', ')', 'FILTER', ';'}
         if name in ignore:
             # print("nothing here to check for")
-            return
-
-        if name == '#update_new':
-            self.update_mode_is_set = True
-            return
-        if name == '#update_end':
-            self.update_mode_is_set = False
             return
 
         if name == ',' and self.lastListNode[len(self.lastListNode)-1] == 'RelationalExpressionContext':

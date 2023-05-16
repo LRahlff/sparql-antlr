@@ -382,11 +382,20 @@ blankNode
     ;
 
 compiler_set
-    : COM_UP_START
-    | COM_UP_END
-    | LINE_COMMENT;
+    : COM_SET compiler_set_instruction
+    | COM_SET compiler_set_instruction
+    ;
+
+compiler_set_instruction
+    : COM_SET_INSTR
+    | COM_SET_INSTR
+    ;
 
 // LEXER RULES
+
+COM_SET_INSTR
+    : 'update_new'
+    | 'update_end';
 
 IRI_REF
     : '<' ( ~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`') | (PN_CHARS))* '>'
@@ -534,9 +543,8 @@ fragment
 DIGIT
     : '0'..'9'
     ;
-
-COM_UP_START: '#update_new';
-COM_UP_END: '#update_end';
+COM_SET
+    : '#*';
 
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
-LINE_COMMENT:       '#' ~[\r\n]*    -> channel(HIDDEN);
+LINE_COMMENT:       '#' (' '|[\r\n]) ~[\r\n]*    -> channel(HIDDEN);
