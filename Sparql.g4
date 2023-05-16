@@ -547,4 +547,4 @@ COM_SET
     : '#*';
 
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
-LINE_COMMENT:       '#' (' '|[\r\n]) ~[\r\n]*    -> channel(HIDDEN);
+LINE_COMMENT:       '#' (~[\r\n*] ~[\r\n]*| ~[\r\n*]?)    -> channel(HIDDEN);
