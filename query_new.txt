@@ -12,29 +12,25 @@ WHERE {
 #* update_new
 	?p1n a :Aktuationskraft;
 	:hat_Wert ?v1;
-	:korrespondiert_mit ?p2n.
+	:korrespondiert_mit ?p2n;
+	:korrespondiert_mit ?p3n.
 
-	?p2n a :Streckung;
+	?p2n a :elektrische_Feldstaerke;
 	:hat_Wert ?v2.
 
-	?p3n a :Aktuationskraft;
-	:hat_Wert ?v3;
-	:korrespondiert_mit ?p4n.
-
-	?p4n a :Streckung;
-	:hat_Wert ?v2.
+	?p3n a :Streckung;
+	:hat_Wert ?v3.
 
 #* update_end
 
 ?mat2 :hat_Parameter ?p1n;
     :hat_Parameter ?p2n;
     :hat_Parameter ?p3n;
-    :hat_Parameter ?p4n;
     :hat_Name ?matnN.
 
-FILTER(?v1 = 2.34)
-FILTER(?v2 = 1)
-FILTER(?v3 = 2.14)
+FILTER(?v1 = 2.9)
+FILTER(?v2 = 40000000)
+FILTER(?v3 = 1)
 FILTER(?matnN = 'Stapelaktor_1')
 
 FILTER(?matN = 'Stapelaktor_1')
