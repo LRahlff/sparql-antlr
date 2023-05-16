@@ -114,7 +114,6 @@ class MyWalkListener(ParseTreeListener):
             return
         if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
             name = ctx.getText()
-            print(name)
             if name == 'update_new':
                 self.update_mode_is_set = True
                 return
