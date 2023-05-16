@@ -1,34 +1,49 @@
 PREFIX : <urn:absolute/prototyp#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-SELECT ?v
+SELECT ?p1 ?p1N ?valE ?matN
 WHERE {
-    ?m a :Modell ;
-       :hat_Eingabe ?p1 ;
-       :hat_Eingabe ?p2 .
-    
-    ?p1 a :relative_Permittivitaet ;
-		a :Parameter_Neu;
-    	:hat_Wert ?val.
-    
-    ?p2 a ?par ;
-    	:hat_Wert ?v.
-	
-    ?m :hat_Ausgabe ?p .
-    ?p :hat_Wert ?v .
+    #* update_new
+	?pnew1 a :Aktuationskraft;
+       :hat_Wert ?val1.
 
-	?mat :hat_Parameter ?p1;
-		 :hat_Name ?material .
+	?pnew2 a :Streckung;
+	    :korrespondiert_mit ?pnew1;
+       :hat_Wert ?val2.
+	?pnew3 a :Aktuationskraft;
+	    :korrespondiert_mit ?pnew4;
+	    :korrespondiert_mit ?pnew5;
+	    :korrespondiert_mit ?pnew6;
+       :hat_Wert ?val3.
 
-	?mat2 :hat_Parameter ?p2;
-		 :hat_Name '1df'
+	?pnew4 a :Streckung;
+       :hat_Wert ?val2.
 
-	FILTER(?par IN (:Kraft, :Parameter_Neu))
+	?pnew5 a :elektrische_Feldstaerke;
+       :hat_Wert ?val5.
+	?pnew6 a :Durchbruchfeldstaerke;
+       :hat_Wert ?val6.
 
-	?mat2 a :Material_Neu
+  	#* update_end
 
-	FILTER(?material =  'M524.5').
-	FILTER(?val =  1).
-	FILTER(?v IN (  17, 18, 19)).
-	FILTER(?material IN ( 'M1100' , 'M1599', 'M524.5' ))
+    ?p1 a :Blockierkraft;
+        :hat_Name ?p1N;
+        :hat_Wert ?valE.
+  	?mat :hat_Parameter ?p1;
+        :hat_Name ?matN;
+        :hat_Parameter ?pnew1;
+        :hat_Parameter ?pnew2;
+        :hat_Parameter ?pnew3;
+        :hat_Parameter ?pnew4;
+        :hat_Parameter ?pnew5;
+        :hat_Parameter ?pnew6;
+
+  FILTER(?matN = 'Stapelaktor_1')
+  FILTER(?val1 = 2.3)
+  FILTER(?val2 = 1)
+  FILTER(?val3 = 2.35)
+  FILTER(?val5 = 0)
+  FILTER(?val6 = 1000000)
+
+
 }

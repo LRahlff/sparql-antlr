@@ -1,49 +1,43 @@
 PREFIX : <urn:absolute/prototyp#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-SELECT ?p1 ?p1N ?val1 ?matN
+SELECT ?p1 ?p1N ?valE ?matN
 WHERE {
-    #* update_new
-	?pnew1 a :Aktuationskraft;
-       :hat_Wert ?val1.
-
-	?pnew2 a :Streckung;
-	    :korrespondiert_mit ?pnew1;
-       :hat_Wert ?val2.
-	?pnew3 a :Aktuationskraft;
-	    :korrespondiert_mit ?pnew4;
-	    :korrespondiert_mit ?pnew5;
-	    :korrespondiert_mit ?pnew6;
-       :hat_Wert ?val3.
-
-	?pnew4 a :Streckung;
-       :hat_Wert ?val2.
-
-	?pnew5 a :elektrische_Feldstaerke;
-       :hat_Wert ?val5.
-	?pnew6 a :Durchbruchfeldstaerke;
-       :hat_Wert ?val6.
-
-  	#* update_end
-
     ?p1 a :Blockierkraft;
         :hat_Name ?p1N;
-        :hat_Wert ?val1.
-  	?mat :hat_Parameter ?p1;
-        :hat_Name ?matN;
-        :hat_Parameter ?pnew1;
-        :hat_Parameter ?pnew2;
-        :hat_Parameter ?pnew3;
-        :hat_Parameter ?pnew4;
-        :hat_Parameter ?pnew5;
-        :hat_Parameter ?pnew6;
+        :hat_Wert ?valE.
 
-  FILTER(?matN = 'Stapelaktor_1')
-  FILTER(?val1 = 2.3)
-  FILTER(?val2 = 1)
-  FILTER(?val3 = 2.35)
-  FILTER(?val5 = 0)
-  FILTER(?val6 = 1000000)
+  ?mat :hat_Parameter ?p1;
+	:hat_Name ?matN.
+#* update_new
+	?p1n a :Aktuationskraft;
+	:hat_Wert ?v1;
+	:korrespondiert_mit ?p2n.
+
+	?p2n a :Streckung;
+	:hat_Wert ?v2.
+
+	?p3n a :Aktuationskraft;
+	:hat_Wert ?v3;
+	:korrespondiert_mit ?p4n.
+
+	?p4n a :Streckung;
+	:hat_Wert ?v2.
+
+#* update_end
+
+?mat2 :hat_Parameter ?p1n;
+    :hat_Parameter ?p2n;
+    :hat_Parameter ?p3n;
+    :hat_Parameter ?p4n;
+    :hat_Name ?matnN.
+
+FILTER(?v1 = 2.34)
+FILTER(?v2 = 1)
+FILTER(?v3 = 2.14)
+FILTER(?matnN = 'Stapelaktor_1')
+
+FILTER(?matN = 'Stapelaktor_1')
 
 
 }
