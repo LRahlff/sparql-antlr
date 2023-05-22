@@ -1,13 +1,20 @@
 PREFIX : <urn:absolute/prototyp#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-SELECT ?p1 ?p1N ?valE ?matN
+SELECT ?p1 ?p1N ?valE ?matN ?mz ?pxN
 WHERE {
     ?p1 a :Blockierkraft;
         :hat_Name ?p1N;
         :hat_Wert ?valE.
+  ?p1 :bestimmt_mit ?mz.
+#  ?mz :hat_Eingabe ?p1n.
+  ?mz :hat_Eingabe ?px.
+  ?px a :Durchbruchfeldstaerke;
+      :hat_Name ?pxN.
+
 
   ?mat :hat_Parameter ?p1;
+  	:hat_Parameter ?p2;
 	:hat_Name ?matN.
 #* update_new
 	?p1n a :Aktuationskraft;
