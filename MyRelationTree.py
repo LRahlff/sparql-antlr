@@ -42,9 +42,9 @@ class MyRelationTree:
     def search_for_new_material(self):
         new_mat = set()
         for subj in self.forward:
-            if self.forward[subj].get(self.A_NODE) is not None:
+            if self.forward[subj].get(self.HAT_NAME_NODE) is not None:
                 if self.forward[subj].get(self.HAT_PARAMETER_NODE) is not None:
-                    for obj in self.forward[subj][self.A_NODE]:
+                    for obj in self.forward[subj][self.HAT_NAME_NODE]:
                         if obj.new: # and obj.__eq__(self.MATERIAL_NODE)
                             new_mat.add(subj)
                         # self.forward[subj][pred].remove(obj)
