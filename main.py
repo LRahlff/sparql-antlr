@@ -14,9 +14,11 @@ if __name__ == '__main__':
 
 	sqlrequest = ""
 	if len(sys.argv) < 2:
+		local = True
 		with open('query_new.txt', 'r') as fr:
 			query = fr.read()
 	else:
+		local = False
 		query = sys.argv[1]
 
 	sparql_lexer = SparqlLexer(InputStream(query))
@@ -203,7 +205,7 @@ if __name__ == '__main__':
 														"(	SELECT sample_id AS name " \
 															"FROM sample " \
 															"UNION SELECT mat_name AS name FROM material " \
-															"UNION SELECT component_name AS name FROM component " \
+															"UNION SELECT concr_component_name AS name FROM concr_component " \
 														") m " \
 															"ON m.name = new_mat.mat " \
 														"WHERE m.name IS NULL ; "
@@ -332,4 +334,7 @@ if __name__ == '__main__':
 		sqlrequest += sql_insert_material(", ".join(material)) + " ; "
 	if len(correspon) > 0:
 		sqlrequest += sql_insert_correspondings(", ".join(correspon)) + " ; "
+
+	if local:
+		sqlrequest = sqlrequest.replace("'", "''")
 	print(sqlrequest)
