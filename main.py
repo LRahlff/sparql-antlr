@@ -34,6 +34,9 @@ if __name__ == '__main__':
 
 	walker.walk(listener, start)
 
+	if listener.error:
+		sys.exit("could not parse the input")
+
 	A_NODE = MyNode('verb', 'a', False)
 	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert', False)
 	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
