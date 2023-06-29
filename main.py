@@ -26,7 +26,16 @@ if __name__ == '__main__':
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
 
+	# walker = ParseTreeWalker()
+	for i in range(len(sparql_tokens.tokens)):
+		print(sparql_tokens.get(i).text + " type: " + str(sparql_tokens.get(i).type) + ": " + " + " + str(sparql_tokens.get(i)))
+
+
 	walker = ParseTreeWalker()
+	print(sparql_lexer)
+	print(sparql_tokens)
+	print(sparql_parser)
+	print(start)
 
 	myTree = MyRelationTree()
 

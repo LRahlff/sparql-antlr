@@ -64,6 +64,12 @@ class MyWalkListener(ParseTreeListener):
 
     def enterEveryRule(self, ctx):
         self.depth += 1
+        pre = ''
+        i = 0
+        while (i < self.depth):
+            pre = pre + '  '
+            i = i + 1
+        print(pre + str(type(ctx)) + " " + ctx.getText())
         # pre = ''
         # i = 0
         # while(i< self.depth):
@@ -129,6 +135,7 @@ class MyWalkListener(ParseTreeListener):
         pass
 
     def visitTerminal(self, node):
+        print('TerminalNode   ' + str(self.depth) + ' ' + str(type(node)) + '  ' + node.getText())
         # print('TerminalNode   ' + str(self.depth) + ' ' + node.getText())
 
         name = node.getText()
