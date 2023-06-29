@@ -37,24 +37,28 @@
 
 grammar Sparql;
 
+
+k_abc: A B C;
+
 query
-    : K_ABC '"' CHARS* '"';
+    : k_abc '"' chars* '"' EOF;
 
 
 //CHARS
 //    : 'A'..'Z'
 //    | 'a'..'z';
 
-CHARS
+
+
+chars
     : A|B|C;
 
-K_ABC: A B C;
 
 
 
-fragment
+//fragment
 A : [Aa];
-fragment
+//fragment
 B : [Bb];
-fragment
+//fragment
 C : [Cc];
