@@ -115,7 +115,7 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' a=triplesBlockMy? (( b=graphPatternNotTriplesMy | c=filter_My ) d='.'? e=triplesBlockMy? )* '}'
+    : '{' triplesBlockMy? (( graphPatternNotTriplesMy | filter_My ) '.'? triplesBlockMy? )* '}'
     ;
 
 triplesBlockMy
@@ -268,8 +268,8 @@ valueLogical
     ;
 
 relationalExpression
-    : l=numericExpression ( m=('=' | '!=' | '<' | '>' | '<=' | '>=') r=numericExpression )?
-    | l=numericExpression n='IN' '(' expression (',' expression)*  ')'
+    : numericExpression ( ('=' | '!=' | '<' | '>' | '<=' | '>=') numericExpression )?
+    | numericExpression 'IN' '(' expression (',' expression)*  ')'
     ;
 
 numericExpression
@@ -395,7 +395,8 @@ compiler_set_instruction
 
 COM_SET_INSTR
     : 'update_new'
-    | 'update_end';
+    | 'update_end'
+    ;
 
 IRI_REF
     : '<' ( ~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`') | (PN_CHARS))* '>'
