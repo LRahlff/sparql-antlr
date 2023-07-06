@@ -46,31 +46,31 @@ prologue
     ;
 
 baseDecl
-    : ('BASE'|'base') IRI_REF
+    : K_BASE IRI_REF
     ;
 
 prefixDecl
-    : ('PREFIX'|'prefix') PNAME_NS IRI_REF
+    : K_PREFIX PNAME_NS IRI_REF
     ;
 
 selectQuery
-    : ('SELECT'|'select') ( ('DISTINCT'|'distinct') | ('REDUCED'|'reduced') )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
+    : K_SELECT ( K_DISTINCT | K_REDUCED )? ( var_+ | '*' ) datasetClause* whereClause solutionModifier
     ;
 
 constructQuery
-    : ('CONSTRUCT'|'construct') constructTemplate datasetClause* whereClause solutionModifier
+    : K_CONSTRUCT constructTemplate datasetClause* whereClause solutionModifier
     ;
 
 describeQuery
-    : ('DESCRIBE'|'describe') ( varOrIRIref+ | '*' ) datasetClause* whereClause? solutionModifier
+    : K_DESCRIBE ( varOrIRIref+ | '*' ) datasetClause* whereClause? solutionModifier
     ;
 
 askQuery
-    : ('ASK'|'ask') datasetClause* whereClause
+    : K_ASK datasetClause* whereClause
     ;
 
 datasetClause
-    : ('FROM'|'from') ( defaultGraphClause | namedGraphClause )
+    : K_FROM ( defaultGraphClause | namedGraphClause )
     ;
 
 defaultGraphClause
@@ -78,7 +78,7 @@ defaultGraphClause
     ;
 
 namedGraphClause
-    : ('NAMED'|'named') sourceSelector
+    : K_NAMED sourceSelector
     ;
 
 sourceSelector
@@ -86,7 +86,7 @@ sourceSelector
     ;
 
 whereClause
-    : ('WHERE'|'where')? groupGraphPattern
+    : K_WHERE? groupGraphPattern
     ;
 
 solutionModifier
@@ -98,20 +98,20 @@ limitOffsetClauses
     ;
 
 orderClause
-    : ('ORDER'|'order') ('BY'|'by') orderCondition+
+    : K_ORDER K_BY orderCondition+
     ;
 
 orderCondition
-    : ( ( ('ASC'|'asc') | ('DESC'|'desc') ) brackettedExpression )
+    : ( ( K_ASC | K_DESC ) brackettedExpression )
     | ( constraint | var_ )
     ;
 
 limitClause
-    : ('LIMIT'|'limit') INTEGER
+    : K_LIMIT INTEGER
     ;
 
 offsetClause
-    : ('OFFSET'|'offset') INTEGER
+    : K_OFFSET INTEGER
     ;
 
 groupGraphPattern
@@ -137,15 +137,15 @@ graphPatternNotTriples
     ;
 
 optionalGraphPattern
-    : ('OPTIONAL'| 'optional') groupGraphPattern
+    : K_OPTIONAL groupGraphPattern
     ;
 
 graphGraphPattern
-    : ('GRAPH'|'graph') varOrIRIref groupGraphPattern
+    : K_GRAPH varOrIRIref groupGraphPattern
     ;
 
 groupOrUnionGraphPattern
-    : groupGraphPattern ( ('UNION'|'union') groupGraphPattern )*
+    : groupGraphPattern ( K_UNION groupGraphPattern )*
     ;
 
 filter_My
@@ -153,7 +153,7 @@ filter_My
     ;
 
 filter_
-    : ('FILTER'|'filter') constraint
+    : K_FILTER constraint
     ;
 
 constraint
@@ -269,7 +269,7 @@ valueLogical
 
 relationalExpression
     : numericExpression ( ('=' | '!=' | '<' | '>' | '<=' | '>=') numericExpression )?
-    | numericExpression 'IN' '(' expression (',' expression)*  ')'
+    | numericExpression K_IN '(' expression (',' expression)*  ')'
     ;
 
 numericExpression
@@ -306,21 +306,21 @@ brackettedExpression
     ;
 
 builtInCall
-    : 'STR' '(' expression ')'
-    | 'LANG' '(' expression ')'
-    | 'LANGMATCHES' '(' expression ',' expression ')'
-    | 'DATATYPE' '(' expression ')'
-    | 'BOUND' '(' var_ ')'
-    | 'sameTerm' '(' expression ',' expression ')'
-    | 'isIRI' '(' expression ')'
-    | 'isURI' '(' expression ')'
-    | 'isBLANK' '(' expression ')'
-    | 'isLITERAL' '(' expression ')'
+    : K_STR '(' expression ')'
+    | K_LANG '(' expression ')'
+    | K_LANGMATCHES '(' expression ',' expression ')'
+    | K_DATATYPE '(' expression ')'
+    | K_BOUND '(' var_ ')'
+    | K_SAMETERM '(' expression ',' expression ')'
+    | K_ISIRI '(' expression ')'
+    | K_ISURI '(' expression ')'
+    | K_ISBLANK '(' expression ')'
+    | K_ISLITERAL '(' expression ')'
     | regexExpression
     ;
 
 regexExpression
-    : 'REGEX' '(' expression ',' expression ( ',' expression )? ')'
+    : K_REGEX '(' expression ',' expression ( ',' expression )? ')'
     ;
 
 iriRefOrFunction
@@ -356,8 +356,8 @@ numericLiteralNegative
     ;
 
 booleanLiteral
-    : 'true'
-    | 'false'
+    : K_TRUE
+    | K_FALSE
     ;
 
 string_
@@ -388,14 +388,83 @@ compiler_set
 
 compiler_set_instruction
     : COM_SET_INSTR
-    | COM_SET_INSTR
+    | COM_SET_INSTR2 INTEGER
     ;
 
 // LEXER RULES
+K_BASE : B A S E;
+K_PREFIX : P R E F I X;
+K_SELECT : S E L E C T;
+K_DISTINCT : D I S T I N C T;
+K_REDUCED : R E D U C E D;
+K_CONSTRUCT : C O N S T R U C T;
+K_DESCRIBE : D E S C R I B E;
+K_ASK : A S K;
+K_FROM : F R O M;
+K_NAMED : N A M E D;
+K_WHERE : W H E R E;
+K_ORDER : O R D E R;
+K_BY : B Y;
+K_ASC : A S C;
+K_DESC : D E S C;
+K_LIMIT : L I M I T;
+K_OFFSET : O F F S E T;
+K_OPTIONAL : O P T I O N A L;
+K_GRAPH : G R A P H;
+K_UNION : U N I O N;
+K_FILTER : F I L T E R;
+K_IN : I N;
+K_STR : S T R;
+K_LANG : L A N G;
+K_LANGMATCHES : L A N G M A T C H E S;
+K_DATATYPE : D A T A T Y P E;
+K_BOUND : B O U N D;
+K_SAMETERM : S A M E T E R M;
+K_ISIRI : I S I R I;
+K_ISURI : I S U R I;
+K_ISBLANK : I S B L A N K;
+K_ISLITERAL : I S L I T E R A L;
+K_REGEX : R E G E X;
+K_TRUE : T R U E;
+K_FALSE : F A L S E;
+
+
+
+
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];
 
 COM_SET_INSTR
     : 'update_new'
     | 'update_end'
+    ;
+
+COM_SET_INSTR2
+    : 'update_amount_values'
     ;
 
 IRI_REF
