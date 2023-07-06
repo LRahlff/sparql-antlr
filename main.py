@@ -1,7 +1,7 @@
 import sys
 from antlr4 import *
 
-from MyNode import MyNode
+from MyNode import MyNode, Relation
 from MyRelationTree import MyRelationTree
 from MyWalkListener import MyWalkListener
 from gen.SparqlLexer import SparqlLexer
@@ -25,8 +25,15 @@ if __name__ == '__main__':
 	sparql_tokens = CommonTokenStream(sparql_lexer)
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
+	# for i in range(len(sparql_tokens.tokens)):
+	# 	print(sparql_tokens.get(i).text + " type: " + str(sparql_tokens.get(i).type) + ": " + " + " + str(sparql_tokens.get(i)))
+
 
 	walker = ParseTreeWalker()
+	# print(sparql_lexer)
+	# print(sparql_tokens)
+	# print(sparql_parser)
+	# print(start)
 
 	myTree = MyRelationTree()
 
@@ -308,9 +315,26 @@ if __name__ == '__main__':
 							params.append("('" + new_value.name + "', '" + obj.name + "')")
 
 			if tree[new_value].get(HAT_WERT_NODE) is not None:
+				found_less = False
+				found_greater = False
+				less_val = 0.0
+				greater_val = 0.0
 				for obj in tree[new_value][HAT_WERT_NODE]:
-					if obj.type == 'numeric':
+					if obj.type == 'numeric' and obj.rel == Relation.EQUAL:
 						values.append("('" + new_value.name + "', " + obj.name + ")")
+					if obj.type == 'numeric' and obj.rel == Relation.LESS:
+						found_less = True
+						# less_val = obj.name
+						less_val = float(obj.name)
+					if obj.type == 'numeric' and obj.rel == Relation.LESS:
+						found_greater = True
+						greater_val = float(obj.name)
+					if found_less and found_greater:
+						interval = (less_val-greater_val) / (obj.nr_of_interval-1)
+						for i in range(obj.nr_of_interval):
+							values.append("('" + new_value.name + "', " + str(found_greater + i * interval) + ")")
+						found_less = False
+						found_greater = False
 
 		if rev_tree.get(new_value) is not None:
 			if rev_tree[new_value].get(HAT_PARAMETER_NODE) is not None:
@@ -328,6 +352,10 @@ if __name__ == '__main__':
 				for co2 in tree[co][CORRESPONDS_NODE]:
 					correspon.append("('" + co.name + "', '" + co2.name + "')")
 
+	print(params)
+	print(values)
+	print(material)
+	print(correspon)
 
 	if len(params)>0:
 		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "

@@ -9,7 +9,7 @@ WHERE {
 #* update_new
         # Kommando um neue Parameter einzufügen. Wichtig: Raute und Stern.
 
-?p a :elektrische_feldstaerke;
+?p a :elektrische_Feldstaerke;
         # System erkennt, dass eine Breite eingefügt werden soll.
      :hat_Wert ?wert.
         # Werte müssen über einen FILTER eingefügt werden.  Die direkte Angabe geht nicht.

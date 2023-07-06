@@ -19,6 +19,7 @@ class MyWalkListener(ParseTreeListener):
         self.searching_for = []
         self.lastListNode = []
         self.update_mode_is_set = False
+        self.nr_of_values_in_interval = 10
 
     def exitEveryRule(self, ctx):
         self.depth -= 1
@@ -63,13 +64,14 @@ class MyWalkListener(ParseTreeListener):
             return
 
     def enterEveryRule(self, ctx):
+        # print(str(type(ctx)) + " " + ctx.getText())
         self.depth += 1
-        # pre = ''
-        # i = 0
-        # while(i< self.depth):
-        #     pre = pre + '  '
-        #     i = i+1
-        # print(pre + ctx.getText())
+        pre = ''
+        i = 0
+        while(i< self.depth):
+            pre = pre + '  '
+            i = i+1
+        # print(pre + str(type(ctx)) + " " + ctx.getText())
         # if isinstance(ctx, SparqlParser.TriplesBlockMyContext):
         #     print("YEA")
         if isinstance(ctx, SparqlParser.TriplesSameSubjectContext):
@@ -123,13 +125,15 @@ class MyWalkListener(ParseTreeListener):
         pass
 
     def visitErrorNode(self, node):
+
+        print(str(type(node)) + " " + node.getText())
         # print('visitErrorNode ' + str(self.depth) + '---------------------------------')
         # print(Fore.RED + 'visitErrorNode ' + str(self.depth) + '---------------------------------' + Style.RESET_ALL)
         self.error = True
         pass
 
     def visitTerminal(self, node):
-        # print('TerminalNode   ' + str(self.depth) + ' ' + node.getText())
+        # print('TerminalNode   ' + str(self.depth) + ' ' + str(type(node)) + '  ' + node.getText())
 
         name = node.getText()
         ignore = {'.', '(', ')', 'FILTER', ';'}
@@ -164,6 +168,7 @@ class MyWalkListener(ParseTreeListener):
                 subj = self.subject[len(self.subject)-1]
                 pred = self.predicate[len(self.predicate)-1]
                 obj = self.object[len(self.object)-1]
+                obj.setNrInInterval(self.nr_of_values_in_interval)
                 self.tree.add(subj, pred, obj)
 
         pass

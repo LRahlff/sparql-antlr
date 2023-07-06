@@ -38,7 +38,28 @@ class MyRelationTree:
                                         self.add(subj2, pred2, obj1)
                                     if var in self.forward[subj2][pred2]:
                                         self.forward[subj2][pred2].remove(var)
-
+                    if pred.is_less():
+                        if self.reverse.get(var) is not None:
+                            for pred2 in self.reverse[var]:
+                                for subj2 in self.reverse[var][pred2]:
+                                    for obj1 in self.forward[var][pred]:
+                                        self.add(subj2, pred2, obj1)
+                                        for val in self.forward[subj2][pred2]:
+                                            if val.__eq__(obj1):
+                                                val.setLess(obj1.nr_of_interval)
+                                    if var in self.forward[subj2][pred2]:
+                                        self.forward[subj2][pred2].remove(var)
+                    if pred.is_greater():
+                        if self.reverse.get(var) is not None:
+                            for pred2 in self.reverse[var]:
+                                for subj2 in self.reverse[var][pred2]:
+                                    for obj1 in self.forward[var][pred]:
+                                        self.add(subj2, pred2, obj1)
+                                        for val in self.forward[subj2][pred2]:
+                                            if val.__eq__(obj1):
+                                                val.setGreater(obj1.nr_of_interval)
+                                    if var in self.forward[subj2][pred2]:
+                                        self.forward[subj2][pred2].remove(var)
         return
 
     def search_for_new_material(self):
