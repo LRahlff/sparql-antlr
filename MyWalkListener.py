@@ -1,11 +1,8 @@
 from antlr4 import ParseTreeListener
 
-from MyNode import MyNode
-from gen.SparqlLexer import SparqlLexer
+from MyNode import MyNode, Relation
+from gen import SparqlLexer
 from gen.SparqlParser import SparqlParser
-
-# import colorama
-# from colorama import Fore, Style
 
 class MyWalkListener(ParseTreeListener):
 
@@ -20,6 +17,7 @@ class MyWalkListener(ParseTreeListener):
         self.lastListNode = []
         self.update_mode_is_set = False
         self.nr_of_values_in_interval = 10
+        self.get_nr_of_interval = False
 
     def exitEveryRule(self, ctx):
         self.depth -= 1
@@ -30,12 +28,6 @@ class MyWalkListener(ParseTreeListener):
             self.predicate.append(None)
             self.subject.pop()
             return
-        # if isinstance(ctx, SparqlParser.VerbContext):
-        #     self.predicate.pop()
-        #     return
-        # if isinstance(ctx, SparqlParser.Object_Context):
-        #     self.object.pop()
-        #     return
         if isinstance(ctx, SparqlParser.Filter_Context):
             self.object.pop()
             self.predicate.pop()
@@ -62,21 +54,19 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'nothing'
             return
+        if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
+            self.get_nr_of_interval = False
+            return
 
     def enterEveryRule(self, ctx):
-        # print(str(type(ctx)) + " " + ctx.getText())
         self.depth += 1
-        pre = ''
-        i = 0
-        while(i< self.depth):
-            pre = pre + '  '
-            i = i+1
+        # pre = ''
+        # i = 0
+        # while(i< self.depth):
+        #     pre = pre + '  '
+        #     i = i+1
         # print(pre + str(type(ctx)) + " " + ctx.getText())
-        # if isinstance(ctx, SparqlParser.TriplesBlockMyContext):
-        #     print("YEA")
         if isinstance(ctx, SparqlParser.TriplesSameSubjectContext):
-            # self.searching_for.append(3)
-            # self.searching_for.append(2)
             self.searching_for.append(1)
             return
         if isinstance(ctx, SparqlParser.VerbContext):
@@ -99,9 +89,6 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.RelationalExpressionContext):
             self.lastListNode.append('RelationalExpressionContext')
             return
-        # if isinstance(ctx, SparqlParser.VerbContext):
-        #     self.terminalType = 'verb'
-        #     return
         if isinstance(ctx, SparqlParser.Var_Context):
             self.terminalType = 'var'
             return
@@ -116,6 +103,9 @@ class MyWalkListener(ParseTreeListener):
             return
         if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
             name = ctx.getText()
+            if name.find("update_amount_values") == 0:
+                self.get_nr_of_interval = True
+                return
             if name == 'update_new':
                 self.update_mode_is_set = True
                 return
@@ -126,7 +116,7 @@ class MyWalkListener(ParseTreeListener):
 
     def visitErrorNode(self, node):
 
-        print(str(type(node)) + " " + node.getText())
+        # print(str(type(node)) + " " + node.getText())
         # print('visitErrorNode ' + str(self.depth) + '---------------------------------')
         # print(Fore.RED + 'visitErrorNode ' + str(self.depth) + '---------------------------------' + Style.RESET_ALL)
         self.error = True
@@ -140,6 +130,14 @@ class MyWalkListener(ParseTreeListener):
         if name in ignore:
             # print("nothing here to check for")
             return
+        # print(type(node))
+        if self.get_nr_of_interval:
+            try:
+                self.nr_of_values_in_interval = int(node.getText())
+            except:
+                # print("error")
+                pass
+        #     self.update_mode_is_set = False
 
         if name == ',' and self.lastListNode[len(self.lastListNode)-1] == 'RelationalExpressionContext':
             self.object.pop()
@@ -162,11 +160,18 @@ class MyWalkListener(ParseTreeListener):
             case 1:
                 self.subject.append(MyNode(self.terminalType, name, self.update_mode_is_set))
             case 2:
-                self.predicate.append(MyNode(self.terminalType, name, self.update_mode_is_set))
+                if node.getText() == '<' or node.getText() == '<=':
+                    rel = Relation.LESS
+                elif node.getText() == '>' or node.getText() == '>=':
+                    rel = Relation.GREATER
+                else:
+                    rel = Relation.EQUAL
+                self.predicate.append(MyNode(self.terminalType, name, self.update_mode_is_set, rel, self.nr_of_values_in_interval))
             case 3:
                 self.object.append(MyNode(self.terminalType, name, self.update_mode_is_set))
                 subj = self.subject[len(self.subject)-1]
                 pred = self.predicate[len(self.predicate)-1]
+                pred.setNrInInterval(self.nr_of_values_in_interval)
                 obj = self.object[len(self.object)-1]
                 obj.setNrInInterval(self.nr_of_values_in_interval)
                 self.tree.add(subj, pred, obj)

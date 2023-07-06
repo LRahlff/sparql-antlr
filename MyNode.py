@@ -7,21 +7,28 @@ class Relation(Enum):
 
 class MyNode:
 
-    def __init__(self, nodetype, name, new):
+    # def __init__(self, nodetype, name, new):
+    #     self.type = nodetype
+    #     self.name = name
+    #     self.new = new
+    #     self.rel = Relation.EQUAL
+    #     self.nr_of_interval = 10
+
+    def __init__(self, nodetype, name, new, rel=Relation.EQUAL, nr_of_interval=10):
         self.type = nodetype
         self.name = name
         self.new = new
-        self.rel = Relation.EQUAL
-        self.nr_of_interval = 10
+        self.rel = rel
+        self.nr_of_interval = nr_of_interval
 
     def __eq__(self, other):
-        return self.type == other.type and self.name == other.name
+        return self.type == other.type and self.name == other.name and self.rel == other.rel
 
     def __hash__(self):
-        return self.type.__hash__() + self.name.__hash__()
+        return self.type.__hash__() + self.name.__hash__() + self.rel.__hash__()
 
     def __str__(self):
-        return self.type + '_' + self.name
+        return self.type + '_' + self.name + '_' + str(self.rel)
 
     def is_var(self):
         return self.type == 'var'

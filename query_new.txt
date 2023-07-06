@@ -13,7 +13,9 @@ WHERE {
         # System erkennt, dass eine Breite eingefügt werden soll.
      :hat_Wert ?wert.
         # Werte müssen über einen FILTER eingefügt werden.  Die direkte Angabe geht nicht.
-  FILTER(?wert = 35000000)
+#* update_amount_values 10
+  FILTER(?wert <= 35000000)
+  FILTER(?wert > 39000000)
 
 #*update_end
         # Ab hier werden keine neuen Parameter erkannt.

@@ -25,15 +25,8 @@ if __name__ == '__main__':
 	sparql_tokens = CommonTokenStream(sparql_lexer)
 	sparql_parser = SparqlParser(sparql_tokens)
 	start = sparql_parser.query()
-	# for i in range(len(sparql_tokens.tokens)):
-	# 	print(sparql_tokens.get(i).text + " type: " + str(sparql_tokens.get(i).type) + ": " + " + " + str(sparql_tokens.get(i)))
-
 
 	walker = ParseTreeWalker()
-	# print(sparql_lexer)
-	# print(sparql_tokens)
-	# print(sparql_parser)
-	# print(start)
 
 	myTree = MyRelationTree()
 
@@ -46,6 +39,8 @@ if __name__ == '__main__':
 
 	A_NODE = MyNode('verb', 'a', False)
 	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert', False)
+	HAT_WERT_LESS_NODE = MyNode('konzept', 'hat_Wert', False, Relation.LESS)
+	HAT_WERT_GREATER_NODE = MyNode('konzept', 'hat_Wert', False, Relation.GREATER)
 	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
 	HAT_NAME_NODE = MyNode('konzept', 'hat_Name', False)
 	CORRESPONDS_NODE = MyNode('konzept', 'korrespondiert_mit', False)
@@ -206,7 +201,10 @@ if __name__ == '__main__':
 		'Parameter': 'undefined'
 	}
 
+	# myTree.print_tree()
 	myTree.traverseVars()
+
+	# myTree.print_tree()
 
 	sql_insert_new_material = lambda materials: "INSERT INTO new_mat_samples " \
 													"SELECT DISTINCT new_mat.mat " \
@@ -302,7 +300,13 @@ if __name__ == '__main__':
 	params = []
 	values = []
 	material = []
+
 	for new_value in new_values:
+
+		found_less = False
+		found_greater = False
+		less_val = 0.0
+		greater_val = 0.0
 		if tree.get(new_value) is not None:
 			if tree[new_value].get(A_NODE) is not None:
 				for obj in tree[new_value][A_NODE]:
@@ -313,28 +317,26 @@ if __name__ == '__main__':
 							params.append("('" + new_value.name + "', '" + koncept_translation[obj.name] + "')")
 						else:
 							params.append("('" + new_value.name + "', '" + obj.name + "')")
-
 			if tree[new_value].get(HAT_WERT_NODE) is not None:
-				found_less = False
-				found_greater = False
-				less_val = 0.0
-				greater_val = 0.0
 				for obj in tree[new_value][HAT_WERT_NODE]:
 					if obj.type == 'numeric' and obj.rel == Relation.EQUAL:
 						values.append("('" + new_value.name + "', " + obj.name + ")")
-					if obj.type == 'numeric' and obj.rel == Relation.LESS:
+			if tree[new_value].get(HAT_WERT_LESS_NODE) is not None:
+				for obj in tree[new_value][HAT_WERT_LESS_NODE]:
+					if obj.type == 'numeric':
 						found_less = True
-						# less_val = obj.name
 						less_val = float(obj.name)
-					if obj.type == 'numeric' and obj.rel == Relation.LESS:
+			if tree[new_value].get(HAT_WERT_GREATER_NODE) is not None:
+				for obj in tree[new_value][HAT_WERT_GREATER_NODE]:
+					if obj.type == 'numeric':
 						found_greater = True
 						greater_val = float(obj.name)
-					if found_less and found_greater:
-						interval = (less_val-greater_val) / (obj.nr_of_interval-1)
-						for i in range(obj.nr_of_interval):
-							values.append("('" + new_value.name + "', " + str(found_greater + i * interval) + ")")
-						found_less = False
-						found_greater = False
+			if found_less and found_greater:
+				interval = (less_val-greater_val) / (obj.nr_of_interval-1)
+				for i in range(obj.nr_of_interval):
+					values.append("('" + new_value.name + "', " + str(greater_val + i * interval) + ")")
+				found_less = False
+				found_greater = False
 
 		if rev_tree.get(new_value) is not None:
 			if rev_tree[new_value].get(HAT_PARAMETER_NODE) is not None:
@@ -351,11 +353,6 @@ if __name__ == '__main__':
 			if tree[co].get(CORRESPONDS_NODE) is not None:
 				for co2 in tree[co][CORRESPONDS_NODE]:
 					correspon.append("('" + co.name + "', '" + co2.name + "')")
-
-	print(params)
-	print(values)
-	print(material)
-	print(correspon)
 
 	if len(params)>0:
 		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "

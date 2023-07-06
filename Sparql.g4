@@ -383,12 +383,11 @@ blankNode
 
 compiler_set
     : COM_SET compiler_set_instruction
-    | COM_SET compiler_set_instruction
     ;
 
 compiler_set_instruction
     : COM_SET_INSTR
-    | COM_SET_INSTR2 INTEGER
+    | COM_SET_AMOUNT_VALUES INTEGER
     ;
 
 // LEXER RULES
@@ -463,7 +462,7 @@ COM_SET_INSTR
     | 'update_end'
     ;
 
-COM_SET_INSTR2
+COM_SET_AMOUNT_VALUES
     : 'update_amount_values'
     ;
 

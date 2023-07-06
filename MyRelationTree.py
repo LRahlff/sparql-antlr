@@ -43,10 +43,8 @@ class MyRelationTree:
                             for pred2 in self.reverse[var]:
                                 for subj2 in self.reverse[var][pred2]:
                                     for obj1 in self.forward[var][pred]:
-                                        self.add(subj2, pred2, obj1)
-                                        for val in self.forward[subj2][pred2]:
-                                            if val.__eq__(obj1):
-                                                val.setLess(obj1.nr_of_interval)
+                                        pred2_new = MyNode(pred2.type, pred2.name, pred2.new, pred.rel, pred.nr_of_interval)
+                                        self.add(subj2, pred2_new, obj1)
                                     if var in self.forward[subj2][pred2]:
                                         self.forward[subj2][pred2].remove(var)
                     if pred.is_greater():
@@ -54,10 +52,8 @@ class MyRelationTree:
                             for pred2 in self.reverse[var]:
                                 for subj2 in self.reverse[var][pred2]:
                                     for obj1 in self.forward[var][pred]:
-                                        self.add(subj2, pred2, obj1)
-                                        for val in self.forward[subj2][pred2]:
-                                            if val.__eq__(obj1):
-                                                val.setGreater(obj1.nr_of_interval)
+                                        pred2_new = MyNode(pred2.type, pred2.name, pred2.new, pred.rel, pred.nr_of_interval)
+                                        self.add(subj2, pred2_new, obj1)
                                     if var in self.forward[subj2][pred2]:
                                         self.forward[subj2][pred2].remove(var)
         return
@@ -106,3 +102,19 @@ class MyRelationTree:
     def get_new_params(self, translation):
         new_val_param = self.search_for_new_param(translation)
         return new_val_param
+
+
+    def print_tree(self):
+        for s in self.forward:
+            print(s.name)
+            for p in self.forward[s]:
+                print("  " + p.name)
+                for o in self.forward[s][p]:
+                    print("    " + o.name)
+    def print_tree_dict(self, tree):
+        for s in tree:
+            print(s.name)
+            for p in tree[s]:
+                print("  " + p.name + " " + str(p.rel))
+                for o in tree[s][p]:
+                    print("    " + o.name)
