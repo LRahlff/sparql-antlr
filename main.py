@@ -206,13 +206,23 @@ if __name__ == '__main__':
 
 	# myTree.print_tree()
 
-	sql_insert_new_material = lambda materials: "INSERT INTO new_mat_samples " \
+	# sql_insert_new_material = lambda materials: "INSERT INTO new_objects " \
+	# 												"SELECT DISTINCT new_mat.mat " \
+	# 												"FROM (VALUES " + materials + ") AS new_mat (mat) " \
+	# 													"LEFT OUTER JOIN  " \
+	# 													"(	SELECT sample_id AS name " \
+	# 														"FROM sample " \
+	# 														"UNION SELECT mat_name AS name FROM material " \
+	# 														"UNION SELECT concr_component_name AS name FROM concr_component " \
+	# 													") m " \
+	# 														"ON m.name = new_mat.mat " \
+	# 													"WHERE m.name IS NULL ; "
+
+	sql_insert_new_material = lambda materials: "INSERT INTO new_objects " \
 													"SELECT DISTINCT new_mat.mat " \
 													"FROM (VALUES " + materials + ") AS new_mat (mat) " \
 														"LEFT OUTER JOIN  " \
-														"(	SELECT sample_id AS name " \
-															"FROM sample " \
-															"UNION SELECT mat_name AS name FROM material " \
+														"(	SELECT mat_name AS name FROM material " \
 															"UNION SELECT concr_component_name AS name FROM concr_component " \
 														") m " \
 															"ON m.name = new_mat.mat " \
@@ -240,38 +250,29 @@ if __name__ == '__main__':
 													"ON valid.new_val_id = newval.new_val_id " +\
 												"WHERE valid.new_val_id IS NOT NULL"
 
-	sql_insert_material = lambda new_material: "INSERT INTO new_mat_sample_id " +\
+	sql_insert_material = lambda new_material: "INSERT INTO new_val_object " +\
 												"SELECT DISTINCT " +\
 												"valid.new_val_id, " +\
-												"m.mat_sample_id " +\
+												"m.object_id " +\
 												"FROM " +\
-													"(SELECT DISTINCT newmat.new_val_id, COALESCE(nam.mat_sample_id, newmat.material) AS material FROM (VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
+													"(SELECT DISTINCT newmat.new_val_id, COALESCE(nam.object_id, newmat.material) AS material FROM (VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
 													"LEFT JOIN ( " +\
-														"SELECT sample_id AS mat_sample_id, " +\
-														"sample_name AS name " +\
-														"FROM sample " +\
-														"UNION SELECT mat_id AS mat_sample_id, " +\
+														"SELECT mat_id AS object_id, " +\
 														"mat_name AS name " +\
 														"FROM material " +\
-														"UNION SELECT concr_component.concr_component_id AS mat_sample_id, " +\
-														"concr_component.concr_component_name AS name " +\
-														"FROM concr_component " +\
 														") nam " +\
 														"ON newmat.material = nam.name " +\
 													") init " +\
 													"LEFT OUTER JOIN  " \
-													"(SELECT sample_id AS mat_sample_id FROM sample " \
-														"UNION SELECT mat_id AS mat_sample_id FROM material " \
-														"UNION SELECT mat_sample_id AS mat_sample_id FROM new_mat_samples " \
-														"UNION SELECT concr_component_id AS mat_sample_id FROM concr_component " \
+													"(SELECT DISTINCT param_id AS object_id FROM concr_part_of_view " \
 													") m " \
-													"ON m.mat_sample_id = init.material " +\
+													"ON m.object_id = init.material " +\
 													"LEFT OUTER JOIN " +\
 														"new_param_id valid " +\
 													"ON valid.new_val_id = init.new_val_id " +\
-												"WHERE m.mat_sample_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
+												"WHERE m.object_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
 
-	# Todo: add only correspondance if they correscpnd: if the are the same material.
+	# Todo: add only correspondance if they correspond: if the are the same material.
 	sql_insert_correspondings = lambda new_corres: "INSERT INTO new_corresponds " +\
 												"SELECT DISTINCT " +\
 												"valid.new_val_id, " +\

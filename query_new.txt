@@ -1,31 +1,45 @@
 PREFIX : <urn:absolute/prototyp#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 
-	# Diese Anfrage beinhaltet nur die Anfrage nach den eingefügten Parametern. Es wird an keiner Stelle nach einem
-	#  berechneten Parameter gefragt.
-SELECT *
+SELECT ?in_ist_neu ?feldstaerke ?feldEinheit ?paramName ?wert ?einheit ?out_ist_neu ?modelName
+
 WHERE {
 
 #* update_new
-        # Kommando um neue Parameter einzufügen. Wichtig: Raute und Stern.
+        # Kommando um neue Parameter einzufügen.
 
-?p a :elektrische_Feldstaerke;
-        # System erkennt, dass eine Breite eingefügt werden soll.
-     :hat_Wert ?wert.
-        # Werte müssen über einen FILTER eingefügt werden.  Die direkte Angabe geht nicht.
-#* update_amount_values 10
-  FILTER(?wert <= 39000000)
-  FILTER(?wert > 35000000)
 
-#*update_end
+?p1 a :Streckung;
+        :hat_Wert ?streckung.
+FILTER(?streckung = 1)
+?p2 a :elektrische_Feldstaerke;
+          :hat_Wert ?feldstaerke;
+          :hat_Einheit ?feldEinheit;
+          :ist_Neu ?in_ist_neu;
+          :korrespondiert_mit ?p1.
+        # Über :korrespondiert_mit wird angegeben, welche Parameter zueinander in Bezug stehen sollen.
+FILTER(?feldstaerke IN (35000000, 36000001))
+        # Filter können über = oder über IN definiert werden, falls mehrere Werte berechnet werden sollen.
+        # Bei Angaben mehrerer Werte wird entsprechend jede mögliche Kombination zu den Korrespondenzen gebildet.
+
+#* update_end
         # Ab hier werden keine neuen Parameter erkannt.
 
-#* update_new
-        # Kommando um neue Parameter einzufügen, hier um neues Material einzufügen
+        # Abfrage von der Berechnung wie gewohnt
+?model :hat_Eingabe ?p2;
+       :hat_Name ?modelName.
 
-?mat :hat_Parameter ?p;
-:hat_Name ?materialName.
-  FILTER (?materialName IN ('TestMaterialNeu', 'Test2MaterialNeu', 'Stapelaktor_1'))
-#*update_end
-        # Ab hier werden wieder keine neuen Parameter bzw. Materialien erkannt.
+?pcalc :hat_Herkunft ?model;
+       :ist_Neu ?out_ist_neu;
+       :hat_Name ?paramName;
+       :hat_Wert ?wert;
+       :hat_Einheit ?einheit.
+
+
+?mat :hat_Parameter ?p1;
+     :hat_Parameter ?p2;
+         :hat_Name ?materialName.
+FILTER (?materialName = 'Stapelaktor_1')
+        # die letzten beide Teile gehören noch zu dem Eintragen von Parametern, damit der Parameter weiß zu welchem Material
+	#  er gehört. Hier wird kein update_new benötigt, da das Material nicht neu ist.
 }
