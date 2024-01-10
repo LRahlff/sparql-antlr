@@ -36,7 +36,10 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.PropertyListNotEmptyContext):
             self.lastListNode.pop()
             return
-        if isinstance(ctx, SparqlParser.RelationalExpressionContext):
+        # if isinstance(ctx, SparqlParser.RelationalExpressionContext):
+        #     self.lastListNode.pop()
+        #     return
+        if isinstance(ctx, SparqlParser.InclusionExpressionContext):
             self.lastListNode.pop()
             return
         if isinstance(ctx, SparqlParser.VerbContext):
@@ -60,12 +63,12 @@ class MyWalkListener(ParseTreeListener):
 
     def enterEveryRule(self, ctx):
         self.depth += 1
-        # pre = ''
-        # i = 0
-        # while(i< self.depth):
-        #     pre = pre + '  '
-        #     i = i+1
-        # print(pre + str(type(ctx)) + " " + ctx.getText())
+        pre = ''
+        i = 0
+        while(i< self.depth):
+            pre = pre + '  '
+            i = i+1
+        print(pre + str(type(ctx)) + " " + ctx.getText())
         if isinstance(ctx, SparqlParser.TriplesSameSubjectContext):
             self.searching_for.append(1)
             return
@@ -86,8 +89,11 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.PropertyListNotEmptyContext):
             self.lastListNode.append('PropertyListNotEmptyContext')
             return
-        if isinstance(ctx, SparqlParser.RelationalExpressionContext):
-            self.lastListNode.append('RelationalExpressionContext')
+        # if isinstance(ctx, SparqlParser.RelationalExpressionContext):
+        #     self.lastListNode.append('RelationalExpressionContext')
+        #     return
+        if isinstance(ctx, SparqlParser.InclusionExpressionContext):
+            self.lastListNode.append('InclusionExpressionContext')
             return
         if isinstance(ctx, SparqlParser.Var_Context):
             self.terminalType = 'var'
@@ -123,7 +129,7 @@ class MyWalkListener(ParseTreeListener):
         pass
 
     def visitTerminal(self, node):
-        # print('TerminalNode   ' + str(self.depth) + ' ' + str(type(node)) + '  ' + node.getText())
+        print('TerminalNode   ' + str(self.depth) + ' ' + str(type(node)) + '  ' + node.getText())
 
         name = node.getText()
         ignore = {'.', '(', ')', 'FILTER', ';'}
@@ -138,8 +144,7 @@ class MyWalkListener(ParseTreeListener):
                 # print("error")
                 pass
         #     self.update_mode_is_set = False
-
-        if name == ',' and self.lastListNode[len(self.lastListNode)-1] == 'RelationalExpressionContext':
+        if name == ',' and self.lastListNode[len(self.lastListNode)-1] == 'InclusionExpressionContext':
             self.object.pop()
             self.searching_for.append(3)
             return
