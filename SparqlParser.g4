@@ -124,11 +124,11 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' compiler_set? triplesBlock? ((graphPatternNotTriples | filter_) '.'? triplesBlock?)* '}'
+    : '{' triplesBlock? ((graphPatternNotTriples | filter_) compiler_set? '.'? triplesBlock?)* '}'
     ;
 
 triplesBlock
-    : triplesSameSubject compiler_set? ('.' compiler_set? triplesBlock?)?
+    : compiler_set? triplesSameSubject compiler_set? ('.' triplesBlock?)?
     ;
 
 graphPatternNotTriples
@@ -380,13 +380,10 @@ blankNode
     ;
 
 compiler_set
-    : COMPILER_SET compiler_set_instruction
-    ;
-
-compilerSign
-    : COMPILER_SET
+    : COMPILER_SIGN compiler_set_instruction
     ;
 
 compiler_set_instruction
     : COM_SET_INSTR
+    | COM_AMOUNT_INSTR INTEGER
     ;

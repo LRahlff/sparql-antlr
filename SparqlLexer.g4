@@ -83,6 +83,10 @@ COM_SET_INSTR
     | 'update_end'
     ;
 
+COM_AMOUNT_INSTR
+    : 'update_amount_values'
+    ;
+
 IRI_REF: '<' (~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`' | ' ' | '\n') | PN_CHARS)* '>';
 
 PNAME_NS: PN_PREFIX? ':';
@@ -176,7 +180,7 @@ fragment PN_CHARS_BASE options {
     | '\uFDF0' ..'\uFFFD'
 ;
 
-COMPILER_SET
+COMPILER_SIGN
     : '#*'
     ;
 
@@ -186,4 +190,4 @@ fragment DIGIT: '0' ..'9';
 
 WS: [ \t\n\r]+ -> channel(HIDDEN);
 
-//LINE_COMMENT:       '#' (~[\r\n*] ~[\r\n]*| ~[\r\n*]?)    -> channel(HIDDEN);
+LINE_COMMENT:       '#' (~[\r\n*] ~[\r\n]*| ~[\r\n*]?)    -> channel(HIDDEN);
