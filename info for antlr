@@ -1,4 +1,4 @@
-java -jar antlr-4.13.1-complete.jar -Dlanguage=Python3 Sparql.g4 -o gen
+ rm -f SparqlLexer.tokens &&  rm -f -r gen && java -jar antlr-4.13.1-complete.jar -Dlanguage=Python3 SparqlParser.g4 SparqlLexer.g4 -o gen
 
 LINE_COMMENT
 : '#' ~[\r\n]* -> skip

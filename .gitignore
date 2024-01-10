@@ -3,3 +3,4 @@ gen/*
 venv/*
 .idea/*
 __pycache__/*
+*.tokens
