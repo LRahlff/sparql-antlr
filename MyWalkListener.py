@@ -1,3 +1,4 @@
+import antlr4
 from antlr4 import ParseTreeListener
 
 from MyNode import MyNode, Relation
@@ -36,9 +37,6 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.PropertyListNotEmptyContext):
             self.lastListNode.pop()
             return
-        # if isinstance(ctx, SparqlParser.RelationalExpressionContext):
-        #     self.lastListNode.pop()
-        #     return
         if isinstance(ctx, SparqlParser.InclusionExpressionContext):
             self.lastListNode.pop()
             return
@@ -57,7 +55,7 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'nothing'
             return
-        if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
+        if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
             self.get_nr_of_interval = False
             return
 
@@ -89,9 +87,6 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.PropertyListNotEmptyContext):
             self.lastListNode.append('PropertyListNotEmptyContext')
             return
-        # if isinstance(ctx, SparqlParser.RelationalExpressionContext):
-        #     self.lastListNode.append('RelationalExpressionContext')
-        #     return
         if isinstance(ctx, SparqlParser.InclusionExpressionContext):
             self.lastListNode.append('InclusionExpressionContext')
             return
@@ -107,7 +102,7 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'numeric'
             return
-        if isinstance(ctx, SparqlParser.Compiler_set_instructionContext):
+        if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
             name = ctx.getText()
             if name.find("update_amount_values") == 0:
                 self.get_nr_of_interval = True
@@ -130,7 +125,6 @@ class MyWalkListener(ParseTreeListener):
 
     def visitTerminal(self, node):
         # print('TerminalNode   ' + str(self.depth) + ' ' + str(type(node)) + '  ' + node.getText())
-
         name = node.getText()
         ignore = {'.', '(', ')', 'FILTER', ';'}
         if name in ignore:
