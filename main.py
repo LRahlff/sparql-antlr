@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
 	myTree = MyRelationTree()
 
-	listener = MyWalkListener(myTree)
+	listener = MyWalkListener(myTree, sparql_lexer)
 
 	walker.walk(listener, start)
 
@@ -42,8 +42,13 @@ if __name__ == '__main__':
 	HAT_WERT_LESS_NODE = MyNode('konzept', 'hat_Wert', False, Relation.LESS)
 	HAT_WERT_GREATER_NODE = MyNode('konzept', 'hat_Wert', False, Relation.GREATER)
 	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
+	HAT_ZUSTANDSGROESSE = MyNode('konzept', 'hat_Zustandsgroesse', False)
 	HAT_NAME_NODE = MyNode('konzept', 'hat_Name', False)
 	CORRESPONDS_NODE = MyNode('konzept', 'korrespondiert_mit', False)
+	IST_NEUE_ANNAHME = MyNode('konzept', 'ist_neue_Annahme', True)
+	HAT_ANNAHME = MyNode('konzept', 'hat_Annahme', False)
+	HAT_NEUES_KENNLINIEN_ELEMENT = MyNode('konzept', 'hat_neues_Kennlinien_Element', True)
+	TRUE_NODE = MyNode('booleanliteral', 'True', True)
 
 	koncept_translation = {
 		'Frequenz': 'Frequenz',
@@ -201,168 +206,24 @@ if __name__ == '__main__':
 		'Parameter': 'undefined'
 	}
 
-	# myTree.print_tree()
 	myTree.traverseVars()
 
-	# myTree.print_tree()
+	# myTree.print_tree_rev()
 
-	# sql_insert_new_material = lambda materials: "INSERT INTO new_objects " \
-	# 												"SELECT DISTINCT new_mat.mat " \
-	# 												"FROM (VALUES " + materials + ") AS new_mat (mat) " \
-	# 													"LEFT OUTER JOIN  " \
-	# 													"(	SELECT sample_id AS name " \
-	# 														"FROM sample " \
-	# 														"UNION SELECT mat_name AS name FROM material " \
-	# 														"UNION SELECT concr_component_name AS name FROM concr_component " \
-	# 													") m " \
-	# 														"ON m.name = new_mat.mat " \
-	# 													"WHERE m.name IS NULL ; "
+	sql_insert = lambda new_values, table: " INSERT INTO " + table + " " \
+												"VALUES " + ", ".join(new_values) + "; "
 
-	sql_insert_new_material = lambda materials: "INSERT INTO new_objects " \
-													"SELECT DISTINCT new_mat.mat " \
-													"FROM (VALUES " + materials + ") AS new_mat (mat) " \
-														"LEFT OUTER JOIN  " \
-														"(	SELECT mat_name AS name FROM material " \
-															"UNION SELECT concr_component_name AS name FROM concr_component " \
-														") m " \
-															"ON m.name = new_mat.mat " \
-														"WHERE m.name IS NULL ; "
 
-	sql_insert_param_id = lambda new_params: "INSERT INTO new_param_id " +\
-												"SELECT DISTINCT " +\
-												"newval.new_val_id, " +\
-												"p.param_id " +\
-												"FROM  " +\
-													"(VALUES " + new_params + ") AS newval (new_val_id, param_id) " +\
-													"LEFT OUTER JOIN " +\
-													"param p " +\
-													"ON p.param_id = newval.param_id " +\
-												"WHERE p.param_id IS NOT NULL"
+	new_obj = myTree.search_for_new_objects()
+	hierarchy = myTree.get_hierarchy()
+	sqlrequest += sql_insert(hierarchy, "new_assumption")
 
-	sql_insert_value = lambda new_values: "INSERT INTO new_value " +\
-												"SELECT DISTINCT " +\
-												"valid.new_val_id, " +\
-												"newval.value " +\
-												"FROM  " +\
-													"(VALUES " + new_values + ") AS newval (new_val_id, value) " +\
-													"LEFT OUTER JOIN " +\
-													"new_param_id valid " +\
-													"ON valid.new_val_id = newval.new_val_id " +\
-												"WHERE valid.new_val_id IS NOT NULL"
+	new_param = myTree.get_new_params(new_obj)
+	new_params = myTree.get_new_param_ids(new_param, koncept_translation)
+	sqlrequest += sql_insert(new_params, "new_param_id")
 
-	sql_insert_material = lambda new_material: "INSERT INTO new_val_object " +\
-												"SELECT DISTINCT " +\
-												"valid.new_val_id, " +\
-												"m.object_id " +\
-												"FROM " +\
-													"(SELECT DISTINCT newmat.new_val_id, COALESCE(nam.object_id, newmat.material) AS material FROM (VALUES " + new_material + ") AS newmat (new_val_id, material) " +\
-													"LEFT JOIN ( " +\
-														"SELECT mat_id AS object_id, " +\
-														"mat_name AS name " +\
-														"FROM material " +\
-														") nam " +\
-														"ON newmat.material = nam.name " +\
-													") init " +\
-													"LEFT OUTER JOIN  " \
-													"(SELECT DISTINCT param_id AS object_id FROM concr_part_of_view " \
-													") m " \
-													"ON m.object_id = init.material " +\
-													"LEFT OUTER JOIN " +\
-														"new_param_id valid " +\
-													"ON valid.new_val_id = init.new_val_id " +\
-												"WHERE m.object_id IS NOT NULL AND valid.new_val_id IS NOT NULL"
-
-	# Todo: add only correspondance if they correspond: if the are the same material.
-	sql_insert_correspondings = lambda new_corres: "INSERT INTO new_corresponds " +\
-												"SELECT DISTINCT " +\
-												"valid.new_val_id, " +\
-												"valid2.new_val_id " +\
-												"FROM  " +\
-													"(VALUES " + new_corres + ") AS newcor (first, sec) " +\
-													"LEFT OUTER JOIN " +\
-													"new_param_id valid " +\
-													"ON valid.new_val_id = newcor.first " +\
-													"LEFT OUTER JOIN " +\
-													"new_param_id valid2 " +\
-													"ON valid2.new_val_id = newcor.sec " +\
-												"WHERE valid.new_val_id IS NOT NULL AND valid2.new_val_id IS NOT NULL"
-
-	new_mat = myTree.get_new_materials()
-
-	# Todo : better way, maybe with lamda function
-	if len(new_mat)>0:
-		materials = "('" + "'), ('".join(new_mat) + "')"
-		sqlrequest += sql_insert_new_material(materials)
-
-	new_values = myTree.get_new_params(koncept_translation)
-
-	tree = myTree.forward
-	rev_tree = myTree.reverse
-	params = []
-	values = []
-	material = []
-
-	for new_value in new_values:
-
-		found_less = False
-		found_greater = False
-		less_val = 0.0
-		greater_val = 0.0
-		if tree.get(new_value) is not None:
-			if tree[new_value].get(A_NODE) is not None:
-				for obj in tree[new_value][A_NODE]:
-					if obj.type == 'string':
-						params.append("('" + new_value.name + "', '" + obj.name + "')")
-					if obj.type == 'konzept':
-						if koncept_translation.get(obj.name) is not None:
-							params.append("('" + new_value.name + "', '" + koncept_translation[obj.name] + "')")
-						else:
-							params.append("('" + new_value.name + "', '" + obj.name + "')")
-			if tree[new_value].get(HAT_WERT_NODE) is not None:
-				for obj in tree[new_value][HAT_WERT_NODE]:
-					if obj.type == 'numeric' and obj.rel == Relation.EQUAL:
-						values.append("('" + new_value.name + "', " + obj.name + ")")
-			if tree[new_value].get(HAT_WERT_LESS_NODE) is not None:
-				for obj in tree[new_value][HAT_WERT_LESS_NODE]:
-					if obj.type == 'numeric':
-						found_less = True
-						less_val = float(obj.name)
-			if tree[new_value].get(HAT_WERT_GREATER_NODE) is not None:
-				for obj in tree[new_value][HAT_WERT_GREATER_NODE]:
-					if obj.type == 'numeric':
-						found_greater = True
-						greater_val = float(obj.name)
-			if found_less and found_greater:
-				interval = (less_val-greater_val) / (obj.nr_of_interval-1)
-				for i in range(obj.nr_of_interval):
-					values.append("('" + new_value.name + "', " + str(greater_val + i * interval) + ")")
-				found_less = False
-				found_greater = False
-
-		if rev_tree.get(new_value) is not None:
-			if rev_tree[new_value].get(HAT_PARAMETER_NODE) is not None:
-				for subrev in rev_tree[new_value][HAT_PARAMETER_NODE]:
-					if tree.get(subrev) is not None:
-						if tree[subrev].get(HAT_NAME_NODE) is not None:
-							for obj2 in tree[subrev][HAT_NAME_NODE]:
-								if obj2.type == 'string' or obj2.type == 'konzept':
-									material.append("('" + new_value.name + "', '" + obj2.name + "')")
-	corres = myTree.search_for_correspondings()
-	correspon = []
-	for co in corres:
-		if tree.get(co) is not None:
-			if tree[co].get(CORRESPONDS_NODE) is not None:
-				for co2 in tree[co][CORRESPONDS_NODE]:
-					correspon.append("('" + co.name + "', '" + co2.name + "')")
-
-	if len(params)>0:
-		sqlrequest += sql_insert_param_id(", ".join(params)) + " ; "
-	if len(values) > 0:
-		sqlrequest += sql_insert_value(", ".join(values)) + " ; "
-	if len(material) > 0:
-		sqlrequest += sql_insert_material(", ".join(material)) + " ; "
-	if len(correspon) > 0:
-		sqlrequest += sql_insert_correspondings(", ".join(correspon)) + " ; "
+	new_values = myTree.get_values(new_param)
+	sqlrequest += sql_insert(new_values, "new_values")
 
 	if local:
 		sqlrequest = sqlrequest.replace("'", "''")

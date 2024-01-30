@@ -1,4 +1,3 @@
-import antlr4
 from antlr4 import ParseTreeListener
 
 from MyNode import MyNode, Relation
@@ -7,7 +6,8 @@ from gen.SparqlParser import SparqlParser
 
 class MyWalkListener(ParseTreeListener):
 
-    def __init__(self, tree):
+    def __init__(self, tree, sparql_lexer):
+        self.lexer = sparql_lexer
         self.tree = tree
         self.depth = 0
         self.error = False
@@ -15,8 +15,8 @@ class MyWalkListener(ParseTreeListener):
         self.predicate = [None]
         self.object = [None]
         self.searching_for = []
-        self.lastListNode = []
-        self.update_mode_is_set = False
+        self.lastListNode = ['empty']
+        # self.update_mode_is_set = False
         self.nr_of_values_in_interval = 10
         self.get_nr_of_interval = False
 
@@ -40,6 +40,10 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.InclusionExpressionContext):
             self.lastListNode.pop()
             return
+        if isinstance(ctx, SparqlParser.BooleanLiteralContext):
+            self.lastListNode.pop()
+            self.terminalType = 'nothing'
+            return
         if isinstance(ctx, SparqlParser.VerbContext):
             self.terminalType = 'nothing'
             return
@@ -55,9 +59,10 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'nothing'
             return
-        if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
-            self.get_nr_of_interval = False
-            return
+        # if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
+        #     self.get_nr_of_interval = False
+        #     return
+
 
     def enterEveryRule(self, ctx):
         self.depth += 1
@@ -87,6 +92,10 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.PropertyListNotEmptyContext):
             self.lastListNode.append('PropertyListNotEmptyContext')
             return
+        if isinstance(ctx, SparqlParser.BooleanLiteralContext):
+            self.lastListNode.append('BooleanLiteralContext')
+            self.terminalType = 'booleanliteral'
+            return
         if isinstance(ctx, SparqlParser.InclusionExpressionContext):
             self.lastListNode.append('InclusionExpressionContext')
             return
@@ -102,17 +111,17 @@ class MyWalkListener(ParseTreeListener):
         if isinstance(ctx, SparqlParser.NumericLiteralContext):
             self.terminalType = 'numeric'
             return
-        if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
-            name = ctx.getText()
-            if name.find("update_amount_values") == 0:
-                self.get_nr_of_interval = True
-                return
-            if name == 'update_new':
-                self.update_mode_is_set = True
-                return
-            if name == 'update_end':
-                self.update_mode_is_set = False
-                return
+        # if isinstance(ctx, SparqlParser.CompilerSetInstructionContext):
+        #     name = ctx.getText()
+        #     if name.find("update_amount_values") == 0:
+        #         self.get_nr_of_interval = True
+        #         return
+        #     if name == 'update_new':
+        #         self.update_mode_is_set = True
+        #         return
+        #     if name == 'update_end':
+        #         self.update_mode_is_set = False
+        #         return
         pass
 
     def visitErrorNode(self, node):
@@ -157,7 +166,7 @@ class MyWalkListener(ParseTreeListener):
 
         match gram:
             case 1:
-                self.subject.append(MyNode(self.terminalType, name, self.update_mode_is_set))
+                self.subject.append(MyNode(self.terminalType, name))
             case 2:
                 if node.getText() == '<' or node.getText() == '<=':
                     rel = Relation.LESS
@@ -165,9 +174,11 @@ class MyWalkListener(ParseTreeListener):
                     rel = Relation.GREATER
                 else:
                     rel = Relation.EQUAL
-                self.predicate.append(MyNode(self.terminalType, name, self.update_mode_is_set, rel, self.nr_of_values_in_interval))
+                self.predicate.append(MyNode(self.terminalType, name, False, rel, self.nr_of_values_in_interval))
             case 3:
-                self.object.append(MyNode(self.terminalType, name, self.update_mode_is_set))
+                if self.lastListNode[len(self.lastListNode)-1] == 'BooleanLiteralContext':
+                    name = str(self.lexer.TRUE == node.getSymbol().type)
+                self.object.append(MyNode(self.terminalType, name))
                 subj = self.subject[len(self.subject)-1]
                 pred = self.predicate[len(self.predicate)-1]
                 pred.setNrInInterval(self.nr_of_values_in_interval)

@@ -78,14 +78,6 @@ SLASH            : '/';
 STAR             : '*';
 
 // MISC
-COM_SET_INSTR
-    : 'update_new'
-    | 'update_end'
-    ;
-
-COM_AMOUNT_INSTR
-    : 'update_amount_values'
-    ;
 
 IRI_REF: '<' (~('<' | '>' | '"' | '{' | '}' | '|' | '^' | '\\' | '`' | ' ' | '\n') | PN_CHARS)* '>';
 
@@ -179,10 +171,6 @@ fragment PN_CHARS_BASE options {
     | '\uF900' ..'\uFDCF'
     | '\uFDF0' ..'\uFFFD'
 ;
-
-COMPILER_SIGN
-    : '#*'
-    ;
 
 fragment DIGIT: '0' ..'9';
 

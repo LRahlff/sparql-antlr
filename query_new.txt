@@ -1,45 +1,33 @@
 PREFIX : <urn:absolute/prototyp#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-
-SELECT ?in_ist_neu ?feldstaerke ?feldEinheit ?paramName ?wert ?einheit ?out_ist_neu ?modelName
+SELECT *
 
 WHERE {
+?aobj :hat_Parameter ?p;
+:hat_Parameter ?p2.
+?p a :elektrische_Feldstaerke;
+:hat_Wert ?value.
+FILTER(?value IN (200000, 400000))
+?p2 a :magnetische_Flussdichte;
+:hat_Wert ?value2.
+FILTER(?value2 <= 200)
+FILTER(?value2 >= 20)
 
-#* update_new
-        # Kommando um neue Parameter einzufügen.
+?mat :hat_neues_Kennlinien_Element ?aobj;
+:hat_Name ?matname.
+FILTER(?matname IN ('Stapelaktor_1', 'Stapelaktor_2'))
 
+?aobj2 :hat_Parameter ?p6;
+:hat_Parameter ?p4.
+?p6 a :elektrische_Feldstaerke;
+:hat_Wert ?value3.
+FILTER(?value3 IN (-5, -10, 2))
+?p4 a :Dehnung;
+:hat_Wert ?value4.
+FILTER(?value4 <= 1)
+FILTER(?value4 >= -3.5)
 
-?p1 a :Streckung;
-        :hat_Wert ?streckung.
-FILTER(?streckung = 1)
-?p2 a :elektrische_Feldstaerke;
-          :hat_Wert ?feldstaerke;
-          :hat_Einheit ?feldEinheit;
-          :ist_Neu ?in_ist_neu;
-          :korrespondiert_mit ?p1.
-        # Über :korrespondiert_mit wird angegeben, welche Parameter zueinander in Bezug stehen sollen.
-FILTER(?feldstaerke IN (35000000, 36000001))
-        # Filter können über = oder über IN definiert werden, falls mehrere Werte berechnet werden sollen.
-        # Bei Angaben mehrerer Werte wird entsprechend jede mögliche Kombination zu den Korrespondenzen gebildet.
+?mat2 :hat_neues_Kennlinien_Element ?aobj2;
+:hat_Name ?matname2.
+FILTER(?matname2 IN ('XYZ', 'ABC'))
 
-#* update_end
-        # Ab hier werden keine neuen Parameter erkannt.
-
-        # Abfrage von der Berechnung wie gewohnt
-?model :hat_Eingabe ?p2;
-       :hat_Name ?modelName.
-
-?pcalc :hat_Herkunft ?model;
-       :ist_Neu ?out_ist_neu;
-       :hat_Name ?paramName;
-       :hat_Wert ?wert;
-       :hat_Einheit ?einheit.
-
-
-?mat :hat_Parameter ?p1;
-     :hat_Parameter ?p2;
-         :hat_Name ?materialName.
-FILTER (?materialName = 'Stapelaktor_1')
-        # die letzten beide Teile gehören noch zu dem Eintragen von Parametern, damit der Parameter weiß zu welchem Material
-	#  er gehört. Hier wird kein update_new benötigt, da das Material nicht neu ist.
 }

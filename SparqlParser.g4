@@ -124,11 +124,11 @@ offsetClause
     ;
 
 groupGraphPattern
-    : '{' triplesBlock? ((graphPatternNotTriples | filter_) compilerSet? '.'? triplesBlock?)* '}'
+    : '{' triplesBlock? ((graphPatternNotTriples | filter_) '.'? triplesBlock?)* '}'
     ;
 
 triplesBlock
-    : compilerSet? triplesSameSubject compilerSet? ('.' triplesBlock?)?
+    : triplesSameSubject ('.' triplesBlock?)?
     ;
 
 graphPatternNotTriples
@@ -182,7 +182,7 @@ triplesSameSubject
     ;
 
 propertyListNotEmpty
-    : verb objectList (';' compilerSet? (verb objectList)?)*
+    : verb objectList (';' (verb objectList)?)*
     ;
 
 propertyList
@@ -377,13 +377,4 @@ prefixedName
 blankNode
     : BLANK_NODE_LABEL
     | ANON
-    ;
-
-compilerSet
-    : COMPILER_SIGN compilerSetInstruction
-    ;
-
-compilerSetInstruction
-    : COM_SET_INSTR
-    | COM_AMOUNT_INSTR INTEGER
     ;

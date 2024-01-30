@@ -14,10 +14,10 @@ class MyNode:
     #     self.rel = Relation.EQUAL
     #     self.nr_of_interval = 10
 
-    def __init__(self, nodetype, name, new, rel=Relation.EQUAL, nr_of_interval=10):
+    def __init__(self, nodetype, name, new = False, rel=Relation.EQUAL, nr_of_interval=10):
         self.type = nodetype
         self.name = name
-        self.new = new
+        self.new = False
         self.rel = rel
         self.nr_of_interval = nr_of_interval
 
