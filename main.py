@@ -197,8 +197,8 @@ if __name__ == '__main__':
 
 	# myTree.print_tree_rev()
 
-	sql_insert = lambda new_values, table: " INSERT INTO " + table + " " \
-												"VALUES " + ", ".join(new_values) + "; "
+	sql_insert = lambda new_values, table: (" INSERT INTO " + table + " " \
+												"VALUES " + ", ".join(new_values) + "; ") if len(new_values) > 0 else " "
 
 
 	new_obj = myTree.search_for_new_objects()
