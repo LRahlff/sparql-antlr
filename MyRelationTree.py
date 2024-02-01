@@ -88,22 +88,22 @@ class MyRelationTree:
             else:
                 pairs.add("('" + subname + "', '" + objname + "')")
 
-    def get_named_pairs(self, subj, koncept, translation = None, reverse = False):
+    def get_named_pairs(self, subj, koncept, translation = None, reverse = False, allow_subject_name = False):
         pairs = set()
         if self.forward.get(subj) is not None:
             if self.forward[subj].get(koncept) is not None:
-                if self.forward[subj].get(self.HAT_NAME_NODE) is None:
-                    self.get_named_pais_inner(pairs, subj, koncept, translation, subj.name, reverse)
-                else:
+                if allow_subject_name and self.forward[subj].get(self.HAT_NAME_NODE) is not None:
                     for names in self.forward[subj][self.HAT_NAME_NODE]:
                         self.get_named_pais_inner(pairs, subj, koncept, translation, names.name, reverse)
+                else:
+                    self.get_named_pais_inner(pairs, subj, koncept, translation, subj.name, reverse)
 
         return pairs
 
     def get_hierarchy(self):
         pairs = set()
         for subj in self.forward:
-            pairs = pairs.union(self.get_named_pairs(subj, self.HAT_NEUE_ABFRAGE_ANNAHME, reverse = True))
+            pairs = pairs.union(self.get_named_pairs(subj, self.HAT_NEUE_ABFRAGE_ANNAHME, reverse=True, allow_subject_name=True))
         return pairs
 
     # def get_new_materials(self, new_obj):

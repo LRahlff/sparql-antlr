@@ -2,19 +2,22 @@ PREFIX : <urn:absolute/prototyp#>
 SELECT *
 
 WHERE {
-?aobj :hat_Parameter ?p;
-:hat_Parameter ?p2.
-?p a :Martensitgehalt;
+?aobj :hat_Parameter ?p.
+# :hat_Parameter ?p2.
+?p a :Dehnung;
+:hat_Name ?p1Name;
 :hat_Wert ?value.
-FILTER(?value IN (0.6, 0.7))
-?p2 a :Dehnung;
-:hat_Wert ?value2.
+ FILTER(?value IN (200000, 400000))
+# ?p2 a :Parameter;
+# :hat_Name ?p2Name;
+# :hat_Wert ?value2.
 # FILTER(?value2 <= 200)
 # FILTER(?value2 >= 20)
-FILTER(?value2 = 0.03)
 
-?mat :hat_neue_Abfrage_Annahme ?aobj;
+?mat :hat_Abfrage_Annahme ?aobj;
 :hat_Name ?matname.
+OPTIONAL {
+    ?mat :hat_neue_Abfrage_Annahme ?aobj}
 FILTER(?matname IN ('Drahtaktor_NiTi#6', 'Stapelaktor_2'))
 
 }
