@@ -37,19 +37,6 @@ if __name__ == '__main__':
 	if listener.error:
 		sys.exit("could not parse the input")
 
-	A_NODE = MyNode('verb', 'a', False)
-	HAT_WERT_NODE = MyNode('konzept', 'hat_Wert', False)
-	HAT_WERT_LESS_NODE = MyNode('konzept', 'hat_Wert', False, Relation.LESS)
-	HAT_WERT_GREATER_NODE = MyNode('konzept', 'hat_Wert', False, Relation.GREATER)
-	HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
-	HAT_ZUSTANDSGROESSE = MyNode('konzept', 'hat_Zustandsgroesse', False)
-	HAT_NAME_NODE = MyNode('konzept', 'hat_Name', False)
-	CORRESPONDS_NODE = MyNode('konzept', 'korrespondiert_mit', False)
-	IST_NEUE_ANNAHME = MyNode('konzept', 'ist_neue_Annahme', True)
-	HAT_ANNAHME = MyNode('konzept', 'hat_Annahme', False)
-	HAT_NEUES_KENNLINIEN_ELEMENT = MyNode('konzept', 'hat_neues_Kennlinien_Element', True)
-	TRUE_NODE = MyNode('booleanliteral', 'True', True)
-
 	koncept_translation = {
 		'Frequenz': 'Frequenz',
 		'Aktivierungsleistung': 'Aktivierungsleistung',

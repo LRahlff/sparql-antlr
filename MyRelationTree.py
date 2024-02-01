@@ -24,7 +24,7 @@ class MyRelationTree:
         self.HAT_PARAMETER_NODE = MyNode('konzept', 'hat_Parameter', False)
         self.HAT_ZUSTANDSGROESSE = MyNode('konzept', 'hat_Zustandsgroesse', False)
         self.HAT_ANNAHME = MyNode('konzept', 'hat_Annahme', False)
-        self.HAT_NEUES_KENNLINIEN_ELEMENT = MyNode('konzept', 'hat_neues_Kennlinien_Element', True)
+        self.HAT_NEUE_ABFRAGE_ANNAHME = MyNode('konzept', 'hat_neue_Abfrage_Annahme', True)
         self.TRUE_NODE = MyNode('booleanliteral', 'True', True)
         self.HAT_WERT_NODE = MyNode('konzept', 'hat_Wert', False)
         self.HAT_WERT_LESS_NODE = MyNode('konzept', 'hat_Wert', False, Relation.LESS)
@@ -69,12 +69,12 @@ class MyRelationTree:
     def search_for_new_objects(self):
         new_obj = set()
         for subj in self.forward:
-            if self.forward[subj].get(self.HAT_NEUES_KENNLINIEN_ELEMENT) is not None:
-                for obj in self.forward[subj][self.HAT_NEUES_KENNLINIEN_ELEMENT]:
+            if self.forward[subj].get(self.HAT_NEUE_ABFRAGE_ANNAHME) is not None:
+                for obj in self.forward[subj][self.HAT_NEUE_ABFRAGE_ANNAHME]:
                     new_obj.add(obj)
         return new_obj
 
-    def get_named_pais_inner(self, pairs, subj, koncept, translation, subname):
+    def get_named_pais_inner(self, pairs, subj, koncept, translation, subname, reverse):
         for obj in self.forward[subj][koncept]:
             objname = obj.name
             if self.forward.get(obj) is not None:
@@ -83,24 +83,27 @@ class MyRelationTree:
                         objname = names.name
             if translation is not None and translation.get(objname) is not None:
                 objname = translation[objname]
-            pairs.add("('" + subname + "', '" + objname + "')")
+            if reverse:
+                pairs.add("('" + objname + "', '" + subname + "')")
+            else:
+                pairs.add("('" + subname + "', '" + objname + "')")
 
-    def get_named_pairs(self, subj, koncept, translation = None):
+    def get_named_pairs(self, subj, koncept, translation = None, reverse = False):
         pairs = set()
         if self.forward.get(subj) is not None:
             if self.forward[subj].get(koncept) is not None:
                 if self.forward[subj].get(self.HAT_NAME_NODE) is None:
-                    self.get_named_pais_inner(pairs, subj, koncept, translation, subj.name)
+                    self.get_named_pais_inner(pairs, subj, koncept, translation, subj.name, reverse)
                 else:
                     for names in self.forward[subj][self.HAT_NAME_NODE]:
-                        self.get_named_pais_inner(pairs, subj, koncept, translation, names.name)
+                        self.get_named_pais_inner(pairs, subj, koncept, translation, names.name, reverse)
 
         return pairs
 
     def get_hierarchy(self):
         pairs = set()
         for subj in self.forward:
-            pairs = pairs.union(self.get_named_pairs(subj, self.HAT_NEUES_KENNLINIEN_ELEMENT))
+            pairs = pairs.union(self.get_named_pairs(subj, self.HAT_NEUE_ABFRAGE_ANNAHME, reverse = True))
         return pairs
 
     # def get_new_materials(self, new_obj):
