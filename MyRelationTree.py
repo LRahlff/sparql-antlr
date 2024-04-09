@@ -112,8 +112,8 @@ class MyRelationTree:
     def get_new_param_ids(self, new_obj, translation):
         pairs = {}
         for subj in new_obj:
-            if self.reverse.get(subj) is not None and self.reverse[subj].get(self.HAT_PARAMETER_NODE) is not None:
-                for obj in self.reverse[subj][self.HAT_PARAMETER_NODE]:
+            if self.reverse.get(subj) is not None and self.reverse[subj].get(self.HAT_ZUSTANDSGROESSE) is not None:
+                for obj in self.reverse[subj][self.HAT_ZUSTANDSGROESSE]:
                     objname = obj.name
                     if self.forward.get(obj) is not None and self.forward[obj].get(self.HAT_NAME_NODE) is not None:
                         for names in self.forward[subj][self.HAT_NAME_NODE]:
@@ -131,8 +131,8 @@ class MyRelationTree:
         new_param = set()
         for subj in new_obj:
             if self.forward.get(subj) is not None:
-                if self.forward[subj].get(self.HAT_PARAMETER_NODE) is not None:
-                    for sub_param in self.forward[subj][self.HAT_PARAMETER_NODE]:
+                if self.forward[subj].get(self.HAT_ZUSTANDSGROESSE) is not None:
+                    for sub_param in self.forward[subj][self.HAT_ZUSTANDSGROESSE]:
                         new_param.add(sub_param)
         return new_param
 
