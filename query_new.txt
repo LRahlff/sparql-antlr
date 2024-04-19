@@ -1,10 +1,11 @@
   PREFIX : <urn:absolute/prototyp#>
 
-  SELECT ?name ?wert ?einheit ?materialName
+  SELECT ?name ?wert ?einheit ?materialName ?name2 ?wert2 ?einheit2
   WHERE {
   ?mat :hat_neue_Abfrage_Annahme ?aobj;
        :hat_Name ?materialName.
-  FILTER (?materialName IN ('Objekt1'))
+FILTER (?materialName IN ('Drahtaktor_NiTi#6'))
+
 
   ?aobj :hat_Zustandsgroesse ?p.
 
@@ -12,5 +13,13 @@
      :hat_Wert ?wert;
      :hat_Einheit ?einheit;
      :hat_Name ?name.
-  FILTER(?wert = 0.85)
+  FILTER(?wert = 0.2)
+
+  ?aobj :hat_Zustandsgroesse ?p2.
+
+  ?p2 a :Dehnung;
+     :hat_Wert ?wert2;
+     :hat_Einheit ?einheit2;
+     :hat_Name ?name2.
+  FILTER(?wert2 IN (0.3, 0.4, 0.5))
   }
