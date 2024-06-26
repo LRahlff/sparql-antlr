@@ -4,22 +4,22 @@
   WHERE {
   ?mat :hat_neue_Abfrage_Annahme ?aobj;
        :hat_Name ?materialName.
-FILTER (?materialName IN ('Drahtaktor_NiTi#6'))
+FILTER (?materialName IN ('MSM_test2_FORC_Messung_1'))
 
 
   ?aobj :hat_Zustandsgroesse ?p.
 
-  ?p a :Martensitgehalt;
+  ?p a :magnetische_Spannung_alpha;
      :hat_Wert ?wert;
      :hat_Einheit ?einheit;
      :hat_Name ?name.
-  FILTER(?wert = 0.2)
+  FILTER(?wert = 1200)
 
   ?aobj :hat_Zustandsgroesse ?p2.
 
-  ?p2 a :Dehnung;
+  ?p2 a :magnetische_Spannung_beta;
      :hat_Wert ?wert2;
      :hat_Einheit ?einheit2;
      :hat_Name ?name2.
-  FILTER(?wert2 IN (0.3, 0.4, 0.5))
+  FILTER(?wert2 IN (450, 550, 650))
   }
